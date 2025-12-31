@@ -421,8 +421,85 @@
     }
     label{font-size:12px; color:var(--muted); display:block; margin-bottom:6px}
   </style>
+
+  <script>
+    // Build identifier for analytics comparisons
+    window.BUILD_VERSION = "0.1.0";
+    // PostHog config (fill these in before sharing broadly)
+    window.POSTHOG_KEY = "YOUR_POSTHOG_KEY";
+    window.POSTHOG_HOST = "https://app.posthog.com";
+  </script>
+
+  <!-- PostHog (minimal snippet). Replace POSTHOG_KEY / POSTHOG_HOST above. -->
+  <script>
+    !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){
+    function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){
+    t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}
+    (p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host+"/static/array.js",
+    (r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);
+    var u=e;void 0!==a?u=e[a]=[]:a="posthog";u.people=u.people||[],u.toString=function(t){
+    var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){
+    return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once people.unset people.increment people.append people.remove people.group set_group add_group remove_group".split(" ");
+    for(n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+  </script>
+
 </head>
 <body>
+
+  <!-- Terms + Analytics Consent Gate (shown once per device) -->
+  <div id="tcOverlay" style="
+    position:fixed; inset:0; z-index:9999;
+    background:rgba(0,0,0,0.85); color:#fff;
+    display:none; align-items:center; justify-content:center;
+    padding:20px;
+  ">
+    <div style="
+      max-width:720px; width:100%;
+      background:#111; border:1px solid #333; border-radius:16px;
+      padding:20px;
+      font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    ">
+      <h2 style="margin:0 0 10px 0;">Block Legends — Test Build</h2>
+
+      <p style="line-height:1.4; margin:0 0 10px 0;">
+        By continuing, you acknowledge this is a test version. Gameplay may change, and bugs may occur.
+        Progress is saved locally on this device (unless the browser storage is cleared).
+      </p>
+
+      <p style="line-height:1.4; margin:0 0 10px 0;">
+        We collect <b>anonymous gameplay analytics</b> (e.g., screens visited, choices made, shift outcomes)
+        to improve balancing and usability. We do <b>not</b> collect names, emails, contacts, or precise location.
+      </p>
+
+      <label style="display:flex; gap:10px; align-items:flex-start; margin:12px 0;">
+        <input id="analyticsOptIn" type="checkbox" checked style="margin-top:4px;">
+        <span>Allow anonymous analytics (recommended for testers)</span>
+      </label>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;">
+        <button id="agreeBtn" style="
+          padding:10px 14px; border-radius:12px; border:0; cursor:pointer;
+          background:#2d6cdf; color:#fff; font-weight:600;
+        ">Agree & Continue</button>
+
+        <button id="declineBtn" style="
+          padding:10px 14px; border-radius:12px; border:1px solid #444; cursor:pointer;
+          background:transparent; color:#fff;
+        ">Decline</button>
+
+        <button id="resetConsentBtn" style="
+          margin-left:auto;
+          padding:10px 14px; border-radius:12px; border:1px solid #444; cursor:pointer;
+          background:transparent; color:#fff;
+        ">Reset Consent</button>
+      </div>
+
+      <p style="opacity:0.8; margin:14px 0 0 0; font-size:13px;">
+        Tip: “Add to Home Screen” improves reliability on mobile.
+      </p>
+    </div>
+  </div>
+
   <div class="app">
     <div class="topbar">
       <div class="brand">
@@ -680,6 +757,119 @@
 
 <script>
 const LS = "block_legends_mvp_v3_progression";
+
+const CONSENT_KEY = "bl_consent_v1";
+const ANALYTICS_KEY = "bl_analytics_enabled_v1";
+const DEVICE_ID_KEY = "bl_device_id_v1";
+let __bl_quitTracked = false;
+
+function getOrCreateDeviceId(){
+  let id = localStorage.getItem(DEVICE_ID_KEY);
+  if(!id){
+    id = (crypto?.randomUUID?.() || ("dev_" + Math.random().toString(16).slice(2) + Date.now()));
+    localStorage.setItem(DEVICE_ID_KEY, id);
+  }
+  return id;
+}
+const device_id = getOrCreateDeviceId();
+
+function analyticsEnabled(){
+  return localStorage.getItem(ANALYTICS_KEY) === "yes";
+}
+
+function initAnalytics(){
+  if(!analyticsEnabled()) return;
+  if(typeof posthog === "undefined" || !window.POSTHOG_KEY || window.POSTHOG_KEY==="YOUR_POSTHOG_KEY") return;
+
+  posthog.init(window.POSTHOG_KEY, {
+    api_host: window.POSTHOG_HOST || "https://app.posthog.com",
+    autocapture: false,
+    capture_pageview: false
+  });
+
+  // Anonymous identify (device only)
+  posthog.identify(device_id);
+
+  trackEvent("session_started", {
+    build_version: window.BUILD_VERSION || "0.1.0",
+    user_agent: navigator.userAgent
+  });
+}
+
+function trackEvent(name, props={}){
+  try{
+    if(!analyticsEnabled()) return;
+    if(typeof posthog === "undefined") return;
+    posthog.capture(name, {
+      ...props,
+      device_id,
+      ts: new Date().toISOString(),
+      build_version: window.BUILD_VERSION || "0.1.0"
+    });
+  }catch{}
+}
+
+function showConsentGateIfNeeded(){
+  const overlay = document.getElementById("tcOverlay");
+  const analyticsOpt = document.getElementById("analyticsOptIn");
+  if(!overlay) return;
+
+  const agreed = localStorage.getItem(CONSENT_KEY) === "yes";
+  if(agreed){
+    // already accepted previously
+    initAnalytics();
+    return;
+  }
+
+  overlay.style.display = "flex";
+
+  const enabled = localStorage.getItem(ANALYTICS_KEY);
+  analyticsOpt.checked = (enabled === null) ? true : (enabled === "yes");
+
+  document.getElementById("agreeBtn").onclick = ()=>{
+    localStorage.setItem(CONSENT_KEY, "yes");
+    localStorage.setItem(ANALYTICS_KEY, analyticsOpt.checked ? "yes" : "no");
+    overlay.style.display = "none";
+    initAnalytics();
+    trackEvent("consent_accepted", { analytics_enabled: analyticsOpt.checked });
+  };
+
+  document.getElementById("declineBtn").onclick = ()=>{
+    localStorage.setItem(CONSENT_KEY, "no");
+    localStorage.setItem(ANALYTICS_KEY, "no");
+    overlay.innerHTML = `
+      <div style="max-width:720px;color:#fff;font-family:system-ui;">
+        <h2>Consent Required</h2>
+        <p>You must agree to the test terms to play this build.</p>
+        <button id="backBtn" style="padding:10px 14px;border-radius:12px;border:0;background:#2d6cdf;color:#fff;font-weight:600;cursor:pointer;">
+          Back
+        </button>
+      </div>`;
+    const backBtn = document.getElementById("backBtn");
+    if(backBtn) backBtn.onclick = ()=> location.reload();
+  };
+
+  document.getElementById("resetConsentBtn").onclick = ()=>{
+    localStorage.removeItem(CONSENT_KEY);
+    localStorage.removeItem(ANALYTICS_KEY);
+    alert("Consent reset. Reloading…");
+    location.reload();
+  };
+}
+
+// Track “quit mid shift” when user backgrounds/locks phone or closes the tab
+document.addEventListener("visibilitychange", ()=>{
+  if(document.hidden && state?.inShift && !__bl_quitTracked){
+    __bl_quitTracked = true;
+    trackEvent("quit_mid_shift", {
+      screen: "match",
+      level: getNextShiftLevel()?.id || null,
+      moves_left: state.movesLeft,
+      shift_pay: state.shiftPay
+    });
+  }
+});
+
 
 const ICONS = {
   BRICK:"🧱", CASH:"💵", HYPE:"🔥", INVENT:"📦", STAR:"⭐", NOTE:"🎧",
@@ -1065,6 +1255,7 @@ function buyBooster(key){
   state.boosters[key] = (state.boosters[key]||0) + 1;
   state.boosterMeta.purchasesThisWeek[key] = bought + 1;
   addLedger("booster", -price, `Bought booster: ${key}`);
+  logEvent("booster_buy", {key, price, week: state.boosterMeta.weekKey});
   saveState();
   renderAll();
   showToast(`Purchased ${key} booster (-$${price})`, 2200);
@@ -1072,6 +1263,8 @@ function buyBooster(key){
 
 function logEvent(type, data={}){
   state.events.push({ t:new Date().toISOString(), type, data });
+  // Send anonymous analytics event (if enabled)
+  trackEvent(type, data);
   saveState();
 }
 
@@ -1109,8 +1302,8 @@ function tipOnce(key, msg){
   showToast(msg, 3000);
 }
 
-function setView(v){ state.view = v; saveState(); renderAll(); }
-function setHubTab(tab){ state.activeHubTab = tab; saveState(); renderAll(); }
+function setView(v){ state.view = v; saveState(); trackEvent("screen_viewed", {screen:v}); renderAll(); }
+function setHubTab(tab){ state.activeHubTab = tab; saveState(); trackEvent("hub_tab_viewed", {tab}); renderAll(); }
 function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
 
 function clamp(x,a,b){ return Math.max(a, Math.min(b, x)); }
@@ -2879,12 +3072,13 @@ function renderAll(){
 $("btnHome").onclick = ()=> setView("hub");
 $("btnHow").onclick = ()=> showHowToPlay();
 $("btnHelp").onclick = ()=> showHowToPlay();
-$("btnProfile").onclick = ()=> showProfileSetup(false);
-$("btnReport").onclick = ()=> openFullReport();
-$("btnOpenReport").onclick = ()=> openFullReport();
+$("btnProfile").onclick = ()=>{ trackEvent("profile_opened", {}); showProfileSetup(false); };
+$("btnReport").onclick = ()=>{ trackEvent("report_opened", {}); openFullReport(); };
+$("btnOpenReport").onclick = ()=>{ trackEvent("report_opened", {source:"hub_quick"}); openFullReport(); };
 
 $("btnStartShift").onclick = ()=>{
   if(state.nextShiftLevelId > state.unlockedShiftLevel) return showToast("That shift is locked. Win the current shift to unlock.");
+  trackEvent("shift_start_clicked", {level: getNextShiftLevel()?.id || null});
   startShift();
 };
 $("btnViewUpgrades").onclick = ()=> setHubTab("upgrades");
@@ -2895,7 +3089,7 @@ $("tabHub").onclick = ()=> setHubTab("hub");
 $("tabUpgrades").onclick = ()=> setHubTab("upgrades");
 $("tabOpps").onclick = ()=> setHubTab("opps");
 
-$("btnBackToHubTop").onclick = ()=> setView("hub");
+$("btnBackToHubTop").onclick = ()=>{ trackEvent("back_to_hub_clicked", {from:"match"}); setView("hub"); };
 
 $("btnReset").onclick = ()=>{
   localStorage.removeItem(LS);
@@ -2907,12 +3101,14 @@ $("btnReset").onclick = ()=>{
   board = null; selected = null; lockInput = false; activeBooster = null;
   cellRefs = []; badgeRefs = []; emojiRefs = [];
 
+  trackEvent("game_reset", {});
   showToast("Reset complete.");
   renderAll();
   showProfileSetup(true);
 };
 
 $("btnExport").onclick = ()=>{
+  trackEvent("export_opened", {});
   const payload = {
     sessionId: state.sessionId,
     startedAt: state.startedAt,
@@ -2936,6 +3132,8 @@ $("btnExport").onclick = ()=>{
 
 /** Boot */
 function boot(){
+  // Terms + analytics gate (first launch)
+  showConsentGateIfNeeded();
   renderAll();
   if(!state.profileSeen){
     showProfileSetup(true);
