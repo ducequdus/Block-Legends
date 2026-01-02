@@ -423,7 +423,12 @@
   </style>
 
   <script>
-    // Build identifier for analytics comparisons
+// DOM helper (must be defined before any handlers)
+const $ = (id)=>document.getElementById(id);
+
+    
+const $$ = (id)=>document.getElementById(id);
+// Build identifier for analytics comparisons
     window.BUILD_VERSION = "0.1.0";
     // PostHog config (fill these in before sharing broadly)
     window.POSTHOG_KEY = "phc_KoVQE3C9SYJEjcaaMR157sgPE8ijL00d47xXJqkV9Z";
@@ -520,6 +525,57 @@
     </div>
 
     <div class="main">
+      <div class="card">
+        <div class="cardHeader">
+          <h2>Business Snapshot</h2>
+          <div class="hint">What you gain from shifts</div>
+        </div>
+        <div class="cardBody">
+          <div class="grid2">
+            <div class="kv good">
+              <div class="k">Cash (Spend on upgrades)</div>
+              <div class="v" id="cash">$0</div>
+            </div>
+            <div class="kv warn">
+              <div class="k">Reputation (Trust)</div>
+              <div class="v" id="rep">50</div>
+            </div>
+            <div class="kv brand">
+              <div class="k">Demand (Customers)</div>
+              <div class="v" id="demand">50</div>
+            </div>
+            <div class="kv">
+              <div class="k">Business Level</div>
+              <div class="v" id="bizLevel">1</div>
+            </div>
+          </div>
+
+
+          <div class="box">
+            <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
+              <span class="pill brand" id="locPill">Locations: 1</span>
+              <span class="pill gray" id="legalPill">Legal: Sole Prop</span>
+              <span class="pill warn" id="stagePill">Stage: Home-based</span>
+            </div>
+            <div class="note" style="margin-top:10px" id="stageNote"></div>
+          </div>
+
+          <div class="box">
+            <div style="font-weight:950; margin-bottom:6px;">Plain-English Objective</div>
+            <div class="note" id="plainObjective"></div>
+          </div>
+
+          <div class="box">
+            <div style="font-weight:950; margin-bottom:6px;">What the goals mean</div>
+            <div class="note">
+              💵 <b>Earn money:</b> clearing tiles earns Shift Pay (you see it immediately).<br/>
+              🗣️ <b>Bad Reviews:</b> take 2 hits. Hit them by clearing tiles next to them.<br/>
+              📦 <b>Deliver crates:</b> crates count when they reach the bottom row.
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="card">
         <div class="cardHeader">
           <h2 id="leftTitle">Block Legends Hub</h2>
@@ -679,6 +735,7 @@
               <button class="boosterBtn" id="bShuffle" data-booster="shuffle">
                 🚚 <span class="count" id="cShuffle">0</span>
               </button>
+              <button class="boosterBtn gear" id="btnShiftShop" title="Buy boosters with Cash (in-shift prices increase each time you buy).">🛒</button>
               <button class="boosterBtn gear" id="btnHelp">❓</button>
             </div>
 
@@ -689,56 +746,7 @@
         </div>
       </div>
 
-      <div class="card">
-        <div class="cardHeader">
-          <h2>Business Snapshot</h2>
-          <div class="hint">What you gain from shifts</div>
-        </div>
-        <div class="cardBody">
-          <div class="grid2">
-            <div class="kv good">
-              <div class="k">Cash (Spend on upgrades)</div>
-              <div class="v" id="cash">$0</div>
-            </div>
-            <div class="kv warn">
-              <div class="k">Reputation (Trust)</div>
-              <div class="v" id="rep">50</div>
-            </div>
-            <div class="kv brand">
-              <div class="k">Demand (Customers)</div>
-              <div class="v" id="demand">50</div>
-            </div>
-            <div class="kv">
-              <div class="k">Business Level</div>
-              <div class="v" id="bizLevel">1</div>
-            </div>
-          </div>
-
-
-          <div class="box">
-            <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
-              <span class="pill brand" id="locPill">Locations: 1</span>
-              <span class="pill gray" id="legalPill">Legal: Sole Prop</span>
-              <span class="pill warn" id="stagePill">Stage: Home-based</span>
-            </div>
-            <div class="note" style="margin-top:10px" id="stageNote"></div>
-          </div>
-
-          <div class="box">
-            <div style="font-weight:950; margin-bottom:6px;">Plain-English Objective</div>
-            <div class="note" id="plainObjective"></div>
-          </div>
-
-          <div class="box">
-            <div style="font-weight:950; margin-bottom:6px;">What the goals mean</div>
-            <div class="note">
-              💵 <b>Earn money:</b> clearing tiles earns Shift Pay (you see it immediately).<br/>
-              🗣️ <b>Bad Reviews:</b> take 2 hits. Hit them by clearing tiles next to them.<br/>
-              📦 <b>Deliver crates:</b> crates count when they reach the bottom row.
-            </div>
-          </div>
-        </div>
-      </div>
+      
     </div>
   </div>
 
@@ -762,6 +770,35 @@ const CONSENT_KEY = "bl_consent_v1";
 const ANALYTICS_KEY = "bl_analytics_enabled_v1";
 const DEVICE_ID_KEY = "bl_device_id_v1";
 let __bl_quitTracked = false;
+
+
+// --- Crash guard (helps when running locally) ---
+window.addEventListener("error", (e)=>{
+  try{
+    console.error("BL BUILD ERROR:", e.error || e.message, e.filename, e.lineno);
+    const msg = (e.error && e.error.stack) ? e.error.stack : (e.message || "Unknown error");
+    const t = document.getElementById("toast");
+    if(t){ t.textContent = "Script error — open DevTools Console for details."; t.style.display="block"; }
+    alert("Block Legends error detected. Open DevTools (F12) → Console to see details.\n\n" + msg);
+  }catch(_){}
+});
+window.addEventListener("unhandledrejection", (e)=>{
+  try{
+    console.error("BL PROMISE REJECTION:", e.reason);
+    alert("Unhandled promise rejection. Open DevTools Console.\n\n" + (e.reason?.stack || e.reason));
+  }catch(_){}
+});
+// --- end crash guard ---
+
+// --- formatting helpers ---
+function currency(v){
+  const n = Number(v);
+  if(!isFinite(n)) return "$0";
+  const sign = n < 0 ? "-" : "";
+  const abs = Math.abs(Math.round(n));
+  return sign + "$" + abs.toLocaleString("en-US");
+}
+// --- end formatting helpers ---
 
 function getOrCreateDeviceId(){
   let id = localStorage.getItem(DEVICE_ID_KEY);
@@ -826,7 +863,7 @@ function showConsentGateIfNeeded(){
   const enabled = localStorage.getItem(ANALYTICS_KEY);
   analyticsOpt.checked = (enabled === null) ? true : (enabled === "yes");
 
-  document.getElementById("agreeBtn").onclick = ()=>{
+  $("agreeBtn").onclick = ()=>{
     localStorage.setItem(CONSENT_KEY, "yes");
     localStorage.setItem(ANALYTICS_KEY, analyticsOpt.checked ? "yes" : "no");
     overlay.style.display = "none";
@@ -834,7 +871,7 @@ function showConsentGateIfNeeded(){
     trackEvent("consent_accepted", { analytics_enabled: analyticsOpt.checked });
   };
 
-  document.getElementById("declineBtn").onclick = ()=>{
+  $("declineBtn").onclick = ()=>{
     localStorage.setItem(CONSENT_KEY, "no");
     localStorage.setItem(ANALYTICS_KEY, "no");
     overlay.innerHTML = `
@@ -849,7 +886,7 @@ function showConsentGateIfNeeded(){
     if(backBtn) backBtn.onclick = ()=> location.reload();
   };
 
-  document.getElementById("resetConsentBtn").onclick = ()=>{
+  $("resetConsentBtn").onclick = ()=>{
     localStorage.removeItem(CONSENT_KEY);
     localStorage.removeItem(ANALYTICS_KEY);
     alert("Consent reset. Reloading…");
@@ -883,7 +920,7 @@ const LEVELS = [
     name: "Grand Opening Rush",
     moves: 18,
     goals: [
-      { type:"earn", target: 66 },
+      { type:"revenue", target: 66 },
       { type:"reviews", target: 6 }
     ],
     spawns: { reviews: 8, crates: 0 }
@@ -893,7 +930,7 @@ const LEVELS = [
     name: "Inventory Rush",
     moves: 20,
     goals: [
-      { type:"earn", target: 90 },
+      { type:"revenue", target: 90 },
       { type:"dropCrates", target: 2 }
     ],
     spawns: { reviews: 0, crates: 4 }
@@ -903,7 +940,7 @@ const LEVELS = [
     name: "Reputation Cleanup",
     moves: 22,
     goals: [
-      { type:"earn", target: 110 },
+      { type:"revenue", target: 110 },
       { type:"reviews", target: 8 },
       { type:"dropCrates", target: 1 }
     ],
@@ -1065,6 +1102,7 @@ const defaultState = () => ({
   },
 
   inShift: false,
+  shiftBoosterPurchases: { promo:0, bomb:0, shuffle:0 },
   movesLeft: 0,
   goals: {},
   revenueEarned: 0,
@@ -1101,7 +1139,8 @@ let cellRefs = [];
 let badgeRefs = [];
 let emojiRefs = [];
 
-const $ = (id)=>document.getElementById(id);
+// (deduped: $ helper defined at top)
+
 const boardEl = $("board");
 const back = $("back");
 const mTitle = $("mTitle");
@@ -1189,16 +1228,16 @@ function canOpenNextLocation(){
 }
 
 function currentWeekKey(){
-  // GAME TIME: 7 shifts = 1 day, 7 days = 1 week (49 shifts)
+  // GAME TIME: 3 shifts = 1 day, 7 days = 1 week (21 shifts)
   const shifts = state.shiftsCompleted || 0;
-  const day = Math.floor(shifts / 7) + 1;         // Day 1 starts at 0-6 shifts
+  const day = Math.floor(shifts / 3) + 1;         // Day 1 starts at 0-2 shifts
   const week = Math.floor((day - 1) / 7) + 1;     // Week 1 starts at days 1-7
   return `G-W${String(week).padStart(2,"0")}`;
 }
 function gameClock(){
   const shifts = state.shiftsCompleted || 0;
-  const day = Math.floor(shifts / 7) + 1;
-  const shiftOfDay = (shifts % 7) + 1;
+  const day = Math.floor(shifts / 3) + 1;
+  const shiftOfDay = (shifts % 3) + 1;
   const week = Math.floor((day - 1) / 7) + 1;
   return { shifts, day, shiftOfDay, week };
 }
@@ -1218,10 +1257,16 @@ function ensureWeeklyReset(){
   if(state.boosterMeta.weekKey !== wk){
     const caps = boosterCaps();
     state.boosters ||= { promo:0, bomb:0, shuffle:0 };
-    // refill up to caps (not infinite stacking)
-    state.boosters.promo = Math.max(state.boosters.promo||0, caps.promo);
-    state.boosters.bomb = Math.max(state.boosters.bomb||0, caps.bomb);
-    state.boosters.shuffle = Math.max(state.boosters.shuffle||0, caps.shuffle);
+    const defaults = { promo:1, bomb:1, shuffle:1 }; // default weekly replenish
+    // refill up to max of defaults and caps (no infinite stacking)
+    const target = {
+      promo: Math.max(defaults.promo, caps.promo),
+      bomb: Math.max(defaults.bomb, caps.bomb),
+      shuffle: Math.max(defaults.shuffle, caps.shuffle)
+    };
+    state.boosters.promo = Math.max(state.boosters.promo||0, target.promo);
+    state.boosters.bomb = Math.max(state.boosters.bomb||0, target.bomb);
+    state.boosters.shuffle = Math.max(state.boosters.shuffle||0, target.shuffle);
     state.boosterMeta.weekKey = wk;
     state.boosterMeta.purchasesThisWeek = { promo:0, bomb:0, shuffle:0 };
     saveState();
@@ -1233,6 +1278,116 @@ function boosterPrice(key){
   const lvl = state.bizLevel || 1;
   return Math.round(base * (1 + bought*0.6) * (1 + (lvl-1)*0.10));
 }
+
+function inShiftBoosterPrice(key){
+  // Players can buy anytime during a shift, but each in-shift buy ramps up fast.
+  // Price = weekly price * (2 + inShiftBuysForThisBooster)
+  const n = (state.shiftBoosterPurchases?.[key] || 0);
+  return Math.round(boosterPrice(key) * (2 + n));
+}
+
+function openShiftBoosterShop(focusKey=null){
+  ensureWeeklyReset();
+  state.shiftBoosterPurchases ||= { promo:0, bomb:0, shuffle:0 };
+
+  const pPromo = inShiftBoosterPrice("promo");
+  const pBomb = inShiftBoosterPrice("bomb");
+  const pShuffle = inShiftBoosterPrice("shuffle");
+
+  const buys = state.shiftBoosterPurchases;
+
+  const html = `
+    <p><b>In-Shift Booster Shop</b></p>
+    <div class="box">
+      <div><b>Cash on Hand:</b> ${currency(state.cash)}</div>
+      <div class="note" style="margin-top:6px;">In-shift purchases are intentionally expensive and get more expensive each time you buy the same booster in this shift.</div>
+    </div>
+
+    <div class="item" style="margin-top:10px;">
+      <div class="left">
+        <div class="badge">📣</div>
+        <div>
+          <h3>Buy Promo <span class="muted">(Bought this shift: ${buys.promo||0})</span></h3>
+          <p>Places a ROW or COL clearer (you choose).</p>
+        </div>
+      </div>
+      <div class="right">
+        <div class="cost">${currency(pPromo)}</div>
+        <button class="btn small ${(state.cash>=pPromo)?'brand':''}" id="shiftBuyPromo" ${(state.cash>=pPromo)?'':'disabled'}>Buy</button>
+      </div>
+    </div>
+
+    <div class="item" style="margin-top:10px;">
+      <div class="left">
+        <div class="badge">🧨</div>
+        <div>
+          <h3>Buy Bomb <span class="muted">(Bought this shift: ${buys.bomb||0})</span></h3>
+          <p>Clears a 3x3 area and damages adjacent Reviews.</p>
+        </div>
+      </div>
+      <div class="right">
+        <div class="cost">${currency(pBomb)}</div>
+        <button class="btn small ${(state.cash>=pBomb)?'brand':''}" id="shiftBuyBomb" ${(state.cash>=pBomb)?'':'disabled'}>Buy</button>
+      </div>
+    </div>
+
+    <div class="item" style="margin-top:10px;">
+      <div class="left">
+        <div class="badge">🚚</div>
+        <div>
+          <h3>Buy Shuffle <span class="muted">(Bought this shift: ${buys.shuffle||0})</span></h3>
+          <p>Shuffles the board when you’re stuck.</p>
+        </div>
+      </div>
+      <div class="right">
+        <div class="cost">${currency(pShuffle)}</div>
+        <button class="btn small ${(state.cash>=pShuffle)?'brand':''}" id="shiftBuyShuffle" ${(state.cash>=pShuffle)?'':'disabled'}>Buy</button>
+      </div>
+    </div>
+  `;
+
+  openModal("In-Shift Shop", html, [{label:"Close", kind:"brand", onClick: closeModal}]);
+
+  // Optional: if a player clicked an empty booster, give a quick hint.
+  if(focusKey){
+    showToast(`Buy more <b>${focusKey}</b> boosters with Cash. Price increases each time you buy in this shift.`, 2600);
+  }
+
+  const w = mBody; // modal body root
+  const bp = w.querySelector("#shiftBuyPromo");
+  if(bp) bp.onclick = ()=> shiftBuyBooster("promo");
+  const bb = w.querySelector("#shiftBuyBomb");
+  if(bb) bb.onclick = ()=> shiftBuyBooster("bomb");
+  const bs = w.querySelector("#shiftBuyShuffle");
+  if(bs) bs.onclick = ()=> shiftBuyBooster("shuffle");
+}
+
+function shiftBuyBooster(key){
+  if(!state.inShift){ showToast("You can only use this shop during a shift."); return; }
+  ensureWeeklyReset();
+  state.shiftBoosterPurchases ||= { promo:0, bomb:0, shuffle:0 };
+
+  const cost = inShiftBoosterPrice(key);
+  if(state.cash < cost){ showToast("Not enough cash."); return; }
+
+  state.cash -= cost;
+  state.boosters[key] = (state.boosters[key]||0) + 1;
+
+  // Count toward weekly purchases too
+  state.boosterMeta.purchasesThisWeek[key] = (state.boosterMeta.purchasesThisWeek[key]||0) + 1;
+
+  // Increase in-shift inflation for this booster
+  state.shiftBoosterPurchases[key] = (state.shiftBoosterPurchases[key]||0) + 1;
+
+  addLedger("booster_shift_buy", -cost, `Bought booster during shift: ${key}`);
+  logEvent("booster_shift_bought", {key, cost, shiftBuys: state.shiftBoosterPurchases[key]});
+
+  saveState();
+  closeModal();
+  renderAll();
+  showToast(`Bought <b>${key}</b> (in-shift).`, 2000);
+}
+
 function maxBoosterPurchasesPerWeek(key){
   const lvl = state.bizLevel || 1;
   const base = { promo:2, bomb:1, shuffle:1 }[key] || 1;
@@ -1288,7 +1443,7 @@ function openModal(title, bodyHTML, actions=[]){
   back.style.display = "flex";
 }
 function closeModal(){ back.style.display = "none"; }
-$("mClose").onclick = closeModal;
+$$("mClose").onclick = closeModal;
 back.addEventListener("click", (e)=>{ if(e.target === back) closeModal(); });
 
 function esc(s){
@@ -1836,12 +1991,18 @@ function showGoalExplainer(key){
 function startShift(){
   const lvl = getNextShiftLevel();
   state.inShift = true;
+  state.shiftEmergencyPurchased = false;
   state.movesLeft = lvl.moves;
 
   state.revenueEarned = 0;
   state.cratesDelivered = 0;
+
+  state.shiftBoosterPurchases = { promo:0, bomb:0, shuffle:0 }; // in-shift buy inflation
   state.reviewsRemoved = 0;
+  // Shift completes here (1 day = 3 shifts)
   state.shiftsCompleted = (state.shiftsCompleted||0) + 1;
+
+  // End-of-day expenses are assessed after every day (every 3 shifts)
   maybeRunAdminDay();
 
   state.shiftPay = 0;
@@ -2033,7 +2194,7 @@ async function resolveLoop(){
 
     if(big){
       const p = big.cells[0];
-      specialCreate = { at:p, tile:{kind:"special", special:"color"} };
+      specialCreate = { at:p, tile:{kind:"special", special:"color", color: colorOf(board[p.r][p.c])} };
     } else if(four){
       const p = four.cells[0];
       const dir = four.dir;
@@ -2043,12 +2204,47 @@ async function resolveLoop(){
     const toClear = uniqueCells(matches);
     const preserveKey = specialCreate ? (specialCreate.at.r+","+specialCreate.at.c) : null;
 
-    const clearedKeys = new Set();
+    // Expand clears when specials are involved (ROW/COL/COLOR)
+    const expandedClear = new Set();
     for(const p of toClear){
       const k = p.r+","+p.c;
       if(k===preserveKey) continue;
+      expandedClear.add(k);
+
+      const t = board[p.r][p.c];
+      if(t && t.kind==="special"){
+        if(t.special==="stripeH"){
+          for(let cc=0;cc<SIZE;cc++) expandedClear.add(p.r+","+cc);
+        }else if(t.special==="stripeV"){
+          for(let rr=0;rr<SIZE;rr++) expandedClear.add(rr+","+p.c);
+        }else if(t.special==="color"){
+          const target = (typeof t.color==="number") ? t.color : null;
+          if(target!==null && target>=0){
+            for(let rr=0;rr<SIZE;rr++){
+              for(let cc=0;cc<SIZE;cc++){
+                const tt = board[rr][cc];
+                if(!tt || tt.kind==="review") continue;
+                if(tt.kind==="basic" && tt.color===target) expandedClear.add(rr+","+cc);
+                if(tt.kind==="special" && (tt.color===target || tt.special==="color")) expandedClear.add(rr+","+cc);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    const clearedKeys = new Set();
+    for(const k of expandedClear){
+      if(k===preserveKey) continue;
+      const [rr,cc] = k.split(",").map(Number);
+      const t = board[rr][cc];
+      if(!t) continue;
+
+      // reviews are only removed by adjacency hits / bomb; specials shouldn't delete them directly
+      if(t.kind==="review") continue;
+
       clearedKeys.add(k);
-      board[p.r][p.c] = null;
+      board[rr][cc] = null;
       addRevenue(6);
     }
 
@@ -2109,6 +2305,12 @@ function onCellClick(e){
 
   if(!selected){
     selected = {r,c};
+    const t = board[r][c];
+    if(t && t.kind==="special"){
+      if(t.special==="stripeH") showToast("ROW clearer: match it to clear the entire row.", 1800);
+      else if(t.special==="stripeV") showToast("COL clearer: match it to clear the entire column.", 1800);
+      else showToast("COLOR clearer: match it to clear a color.", 1800);
+    }
     renderBoard();
     return;
   }
@@ -2151,13 +2353,23 @@ function onCellClick(e){
 
 /* Boosters */
 function setActiveBooster(key){
+  // If no boosters left, let the player buy more with the cash they actually have.
+  // In-shift prices increase each time you buy the same booster in the same shift.
+  const have = state.boosters?.[key] || 0;
+  if(have <= 0){
+    openShiftBoosterShop(key);
+    return;
+  }
+
   if(activeBooster===key) activeBooster = null;
   else activeBooster = key;
   renderAll();
 }
-$("bPromo").onclick = ()=>{ tipOnce("promoTip", "📣 Promo: tap a tile to place a ROW/COL clearer."); setActiveBooster("promo"); };
-$("bBomb").onclick = ()=>{ tipOnce("bombTip", "🧾 Bomb: tap a tile to clear 3x3 (Rep -1)."); setActiveBooster("bomb"); };
-$("bShuffle").onclick = ()=>{ tipOnce("shuffleTip", "🚚 Shuffle: reshuffles the board if you’re stuck."); setActiveBooster("shuffle"); };
+
+$$("bPromo").onclick = ()=>{ tipOnce("promoTip", "📣 Promo: tap a tile to place a ROW/COL clearer."); setActiveBooster("promo"); };
+$$("bBomb").onclick = ()=>{ tipOnce("bombTip", "🧾 Bomb: tap a tile to clear 3x3 (Rep -1)."); setActiveBooster("bomb"); };
+$$("bShuffle").onclick = ()=>{ tipOnce("shuffleTip", "🚚 Shuffle: reshuffles the board if you’re stuck."); setActiveBooster("shuffle"); };
+$$("btnShiftShop").onclick = ()=>{ openShiftBoosterShop(); };
 
 function renderBoosterUI(){
   $("cPromo").textContent = state.boosters.promo;
@@ -2187,8 +2399,25 @@ function usePromo(r,c){
   const t = board[r][c];
   if(!t || t.kind==="review"){ showToast("Pick a regular tile."); return; }
 
+  openModal(
+    "Promo Direction",
+    `<p>Choose what to place on this tile:</p>
+     <div class="box">
+       <div class="note">ROW clears the entire row. COL clears the entire column.</div>
+     </div>`,
+    [
+      {label:"Cancel", onClick: closeModal},
+      {label:"Place ROW clearer", kind:"brand", onClick: ()=>{ closeModal(); placePromoSpecial(r,c,"stripeH"); }},
+      {label:"Place COL clearer", kind:"brand", onClick: ()=>{ closeModal(); placePromoSpecial(r,c,"stripeV"); }}
+    ]
+  );
+}
+
+function placePromoSpecial(r,c,special){
+  const t = board[r][c];
+  if(!t || t.kind==="review"){ showToast("Pick a regular tile."); return; }
+
   state.boosters.promo--;
-  const special = (c%2===0) ? "stripeH" : "stripeV";
   const col = (t.kind==="basic") ? t.color : randColor();
   board[r][c] = { kind:"special", special, color: col };
   logEvent("booster_promo", {r,c,special});
@@ -2196,7 +2425,7 @@ function usePromo(r,c){
   saveState();
   renderAll();
   renderBoard();
-  showToast("Promo placed 📣");
+  showToast(special==="stripeH" ? "ROW clearer placed 📣" : "COL clearer placed 📣");
 }
 
 async function useRefundBomb(r,c){
@@ -2368,9 +2597,6 @@ function endShift(win){
     );
   }
 
-  state.shiftsCompleted = (state.shiftsCompleted||0) + 1;
-  maybeRunAdminDay();
-
   state.shiftPay = 0;
   saveState();
   renderAll();
@@ -2440,8 +2666,8 @@ function showProfileSetup(force=false){
     [
       {label:"Cancel", onClick: ()=>{ if(force){ /* no cancel on forced */ } closeModal(); }},
       {label:"Save", kind:"brand", onClick: ()=>{
-        const o = document.getElementById("inpOwner").value.trim();
-        const b = document.getElementById("inpBiz").value.trim();
+        const o = $("inpOwner").value.trim();
+        const b = $("inpBiz").value.trim();
         const city = document.getElementById("inpCity")?.value.trim() || "";
         const st = document.getElementById("inpState")?.value.trim() || "";
         const country = document.getElementById("inpCountry")?.value.trim() || "";
@@ -2487,13 +2713,46 @@ function showProfileSetup(force=false){
 
 
 function recurringExpensesAmount(){
-  const stage = state.operationStage || "home";
-  const base = stage==="home" ? 18 : (stage==="foodtruck" ? 32 : 55);
-  const loc = Math.max(0, (state.locations||1) - 1);
-  const legal = (state.legal?.llc ? 6 : (state.legal?.dba ? 3 : 0));
-  const staffLvl = state.upgrades?.staff || 0;
-  const staffUpkeep = Math.min(12, staffLvl);
-  return base + loc*14 + legal + staffUpkeep + (state.insurance?.active ? insurancePremium() : 0);
+  // End-of-day overhead scales with where you are (home/foodtruck/storefront),
+  // how big you are (bizLevel, locations), and how much you've upgraded.
+  const stage = state.operationStage || "home"; // home -> foodtruck -> storefront
+  const stageBase = (stage==="home") ? 55 : (stage==="foodtruck" ? 95 : 160);
+
+  const bizLevel = Math.max(1, state.bizLevel||1);
+  const locations = Math.max(1, state.locations||1);
+
+  const L = state.legal || {dba:false,llc:false,ein:false};
+
+  // Legal daily costs (rolled up from recurring obligations)
+  const legalDaily =
+    (L.dba ? 10 : 0) +
+    (L.llc ? 25 : 0) +
+    (L.ein ? 5 : 0);
+
+  const up = state.upgrades || {packaging:0, staff:0, marketing:0, equipment:0};
+  const packagingUpkeep = (up.packaging||0) * 12;   // quality control + materials
+  const staffUpkeep = (up.staff||0) * 18;           // payroll pressure (simplified)
+  const marketingUpkeep = (up.marketing||0) * 20;   // ongoing spend to keep demand
+  const equipmentUpkeep = (up.equipment||0) * 25;   // maintenance + depreciation
+
+  // Bigger business = bigger bills (rent/utilities, compliance, waste)
+  const scale =
+    (bizLevel-1) * 45 +
+    (locations-1) * 65;
+
+  // Optional insurance adds premium (already demand-scaled in insurancePremium())
+  const insurance = (state.insurance?.active ? insurancePremium() : 0);
+
+  // Demand increases variable costs slightly (more customers = more supplies/staff strain)
+  const demand = Math.max(0, state.demand||0);
+  const variable = Math.round(demand * 0.35);
+
+  const total = stageBase + scale + legalDaily +
+    packagingUpkeep + staffUpkeep + marketingUpkeep + equipmentUpkeep +
+    insurance + variable;
+
+  // Keep it meaningful; never trivial.
+  return Math.max(45, Math.round(total));
 }
 
 function insurancePremium(){
@@ -2521,7 +2780,7 @@ function maybeRunAdminDay(){
   const expense = recurringExpensesAmount();
   const before = state.cash;
   state.cash = Math.max(0, state.cash - expense);
-  addLedger("expense", -expense, "Recurring expenses (every 3 shifts): supplies, fees, small upkeep");
+  addLedger("expense", -expense, "End of Day expenses: supplies, fees, upkeep");
   logEvent("admin_expenses", {expense, beforeCash: before, afterCash: state.cash});
   saveState();
 
@@ -2600,21 +2859,21 @@ function maybeRunAdminDay(){
     `);
   }
 
-  openModal(
-    "Admin Day 🧾",
-    `
-      <p><b>Every 3 shifts</b> you pay real-world operating costs. This keeps money from feeling “free.”</p>
-      <div class="box">
-        <div class="note">Expenses paid now: <b>$${expense}</b><br/>Cash: <b>$${state.cash}</b></div>
-      </div>
-      <div class="box">
-        <div style="font-weight:950;margin-bottom:6px;">Legal & Setup (Optional)</div>
-        <div class="note">Choose what fits your stage. You can also do nothing for now.</div>
-      </div>
-      ${cards.length ? `<div class="list">${cards.join("")}</div>` : `<div class="note">You’ve completed the available setup steps for this cycle.</div>`}
-    `,
-    [{label:"Continue", kind:"primary", onClick: ()=>{ closeModal(); renderAll(); }}]
-  );
+  if(back.style.display==="flex"){
+    showToast(`End of Day: -$${expense} expenses paid.`, 2600);
+  }else{
+    openModal(
+      "End of Day 🧾",
+      `
+        <p><b>End of Day:</b> Every <b>3 shifts</b> (1 day), operating costs are deducted. This keeps money from feeling “free.”</p>
+        <div class="box">
+          <div><b>Expenses:</b> -$${expense}</div>
+          <div class="note" style="margin-top:6px;">Costs scale with your Business Level and upgrades. Keep an eye on Cash.</div>
+        </div>
+      `,
+      [{label:"Continue", kind:"brand", onClick: ()=>{ closeModal(); renderAll(); }}]
+    );
+  }
 
   setTimeout(()=>{
     const dbaBtn = document.getElementById("btnDBA");
@@ -2663,7 +2922,7 @@ function buildReport(){
   else wins.push("Demand is balanced with trust.");
 
   const toNextAdmin = (3 - ((state.shiftsCompleted||0) % 3)) % 3;
-  const adminMsg = toNextAdmin===0 ? "Admin Day is due now (after this cycle)." : `Admin Day in ${toNextAdmin} shift(s).`;
+  const adminMsg = toNextAdmin===0 ? "End of Day is due now (after this cycle)." : `End of Day in ${toNextAdmin} shift(s).`;
 
   const stageInfo = canAdvanceStage();
   const locInfo = canOpenNextLocation();
@@ -2834,7 +3093,7 @@ function openBoosterShop(){
   const caps = boosterCaps();
   const wk = state.boosterMeta.weekKey || currentWeekKey();
   const body = `
-    <p><b>Booster Shop</b> — Weekly restock happens automatically (Game Week ${esc(wk)}). <span class='note'>7 shifts = 1 day • 7 days = 1 week</span></p>
+    <p><b>Booster Shop</b> — Weekly restock happens automatically (Game Week ${esc(wk)}). <span class='note'>3 shifts = 1 day • 7 days = 1 week</span></p>
     <div class="box">
       <div class="note">You can buy boosters, but there are weekly limits and prices rise each purchase.</div>
     </div>
@@ -3028,8 +3287,8 @@ function renderAll(){
   const toNextAdmin = (3 - ((state.shiftsCompleted||0) % 3)) % 3;
   if($("adminCyclePill")) $("adminCyclePill").textContent = (()=>{
     const clk = gameClock();
-    const adminTxt = (toNextAdmin===0 ? "Admin Day: now" : `Admin Day: in ${toNextAdmin} shift(s)`);
-    return `Day ${clk.day} • Shift ${clk.shiftOfDay}/7 • ${adminTxt}`;
+    const adminTxt = (toNextAdmin===0 ? "End of Day: now" : `End of Day: in ${toNextAdmin} shift(s)`);
+    return `Day ${clk.day} • Shift ${clk.shiftOfDay}/3 • ${adminTxt}`;
   })();
 
   // report summary
@@ -3069,29 +3328,29 @@ function renderAll(){
 }
 
 /** Buttons */
-$("btnHome").onclick = ()=> setView("hub");
-$("btnHow").onclick = ()=> showHowToPlay();
-$("btnHelp").onclick = ()=> showHowToPlay();
-$("btnProfile").onclick = ()=>{ trackEvent("profile_opened", {}); showProfileSetup(false); };
-$("btnReport").onclick = ()=>{ trackEvent("report_opened", {}); openFullReport(); };
-$("btnOpenReport").onclick = ()=>{ trackEvent("report_opened", {source:"hub_quick"}); openFullReport(); };
+$$("btnHome").onclick = ()=> setView("hub");
+$$("btnHow").onclick = ()=> showHowToPlay();
+$$("brandH").onclick = ()=> showHowToPlay();
+$$("btnProfile").onclick = ()=>{ trackEvent("profile_opened", {}); showProfileSetup(false); };
+$$("btnReport").onclick = ()=>{ trackEvent("report_opened", {}); openFullReport(); };
+$$("btnOpenReport").onclick = ()=>{ trackEvent("report_opened", {source:"hub_quick"}); openFullReport(); };
 
-$("btnStartShift").onclick = ()=>{
+$$("btnStartShift").onclick = ()=>{
   if(state.nextShiftLevelId > state.unlockedShiftLevel) return showToast("That shift is locked. Win the current shift to unlock.");
   trackEvent("shift_start_clicked", {level: getNextShiftLevel()?.id || null});
   startShift();
 };
-$("btnViewUpgrades").onclick = ()=> setHubTab("upgrades");
-$("btnViewOpps").onclick = ()=> setHubTab("opps");
-$("btnExpand").onclick = ()=> expandBusiness();
+$$("btnViewUpgrades").onclick = ()=> setHubTab("upgrades");
+$$("btnViewOpps").onclick = ()=> setHubTab("opps");
+$$("btnExpand").onclick = ()=> expandBusiness();
 
-$("tabHub").onclick = ()=> setHubTab("hub");
-$("tabUpgrades").onclick = ()=> setHubTab("upgrades");
-$("tabOpps").onclick = ()=> setHubTab("opps");
+$$("tabHub").onclick = ()=> setHubTab("hub");
+$$("btnViewUpgrades").onclick = ()=> setHubTab("upgrades");
+$$("btnViewOpps").onclick = ()=> setHubTab("opps");
 
-$("btnBackToHubTop").onclick = ()=>{ trackEvent("back_to_hub_clicked", {from:"match"}); setView("hub"); };
+$$("btnBackToHubTop").onclick = ()=>{ trackEvent("back_to_hub_clicked", {from:"match"}); setView("hub"); };
 
-$("btnReset").onclick = ()=>{
+$$("btnReset").onclick = ()=>{
   localStorage.removeItem(LS);
   state = defaultState();
   state.sessionId = "sess_" + Math.random().toString(16).slice(2) + "_" + Date.now().toString(16);
@@ -3107,7 +3366,7 @@ $("btnReset").onclick = ()=>{
   showProfileSetup(true);
 };
 
-$("btnExport").onclick = ()=>{
+$$("btnExport").onclick = ()=>{
   trackEvent("export_opened", {});
   const payload = {
     sessionId: state.sessionId,
