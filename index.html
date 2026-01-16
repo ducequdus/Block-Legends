@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <!-- Developer: Qudus "Deuce" Oduniyi | Block Legends -->
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Block Legends — Trap to Table + Hustle Match (MVP)</title>
@@ -360,7 +361,8 @@
     }
 
     .back{
-      position:fixed; inset:0;
+      position:fixed; 
+      inset:0;
       background: rgba(0,0,0,.58);
       display:none;
       align-items:center;
@@ -420,36 +422,169 @@
       outline:none;
     }
     label{font-size:12px; color:var(--muted); display:block; margin-bottom:6px}
+    
+    /* Item styles for booster shop */
+    .item{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:12px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      border-radius:14px;
+      margin-bottom:10px;
+    }
+    .item .left{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex:1;
+      min-width:0;
+    }
+    .item .right{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .item .badge{
+      font-size:24px;
+    }
+    .item h3{
+      margin:0 0 4px 0;
+      font-size:14px;
+    }
+    .item .muted{
+      font-size:12px;
+      color:var(--muted);
+    }
+    .item .cost{
+      font-weight:950;
+      font-size:16px;
+    }
+    .muted{
+      color: var(--muted);
+      font-size: 12px;
+    }
+    
+    /* Audio toggle */
+    .audio-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 25px;
+      background: rgba(124,58,237,.2);
+      border: 1px solid rgba(124,58,237,.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 100;
+      font-size: 24px;
+    }
+    
+    /* Alex floating button */
+    #alexFloatingBtn {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 30px;
+      background: linear-gradient(180deg, rgba(124,58,237,.9), rgba(104,38,217,.8));
+      border: 2px solid rgba(255,255,255,.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 99;
+      font-size: 28px;
+      box-shadow: 0 4px 20px rgba(124,58,237,.4);
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); box-shadow: 0 4px 20px rgba(124,58,237,.4); }
+      50% { transform: scale(1.05); box-shadow: 0 4px 30px rgba(124,58,237,.6); }
+      100% { transform: scale(1); box-shadow: 0 4px 20px rgba(124,58,237,.4); }
+    }
+    
+    #alexFloatingBtn:hover {
+      transform: scale(1.1);
+      transition: transform 0.2s ease;
+    }
   </style>
 
-  <script>
-// DOM helper (must be defined before any handlers)
-const $ = (id)=>document.getElementById(id);
-
-    
-const $$ = (id)=>document.getElementById(id);
-// Build identifier for analytics comparisons
-    window.BUILD_VERSION = "0.1.0";
-    // PostHog config (fill these in before sharing broadly)
-    window.POSTHOG_KEY = "phc_KoVQE3C9SYJEjcaaMR157sgPE8ijL00d47xXJqkV9Z";
-    window.POSTHOG_HOST = "https://us.i.posthog.com";
-  </script>
-
-  <!-- PostHog (minimal snippet). Replace POSTHOG_KEY / POSTHOG_HOST above. -->
-  <script>
-    !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){
-    function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){
-    t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}
-    (p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host+"/static/array.js",
-    (r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);
-    var u=e;void 0!==a?u=e[a]=[]:a="posthog";u.people=u.people||[],u.toString=function(t){
-    var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){
-    return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once people.unset people.increment people.append people.remove people.group set_group add_group remove_group".split(" ");
-    for(n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
-  </script>
+  <style>
+  /* Alex onboarding controls: make selection robust */
+  #alexOverlay label[data-startpath]{transition:transform .06s ease, background .15s ease, border-color .15s ease; }
+  #alexOverlay label[data-startpath].selected{border-color: rgba(52,211,153,.55) !important; background: rgba(52,211,153,.10) !important;}
+  #alexOverlay label[data-startpath]:active{transform:scale(.99);}
+  
+  /* Interactive Alex styles */
+  .alex-option {
+    border: 1px solid rgba(255,255,255,.1);
+    background: rgba(255,255,255,.03);
+    border-radius: 14px;
+    padding: 12px;
+    margin: 8px 0;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .alex-option:hover {
+    background: rgba(124,58,237,.1);
+    border-color: rgba(124,58,237,.3);
+  }
+  .alex-response {
+    background: rgba(52,211,153,.1);
+    border: 1px solid rgba(52,211,153,.3);
+    border-radius: 14px;
+    padding: 12px;
+    margin: 12px 0;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
 
 </head>
 <body>
+
+  <!-- Enhanced Alex Interactive Onboarding -->
+  <div id="alexOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.85); z-index:9999; align-items:center; justify-content:center; padding:14px; pointer-events:auto;">
+    <div style="width:min(900px,100%); border-radius:18px; border:1px solid rgba(255,255,255,.14); background:linear-gradient(180deg, rgba(10,16,32,.92), rgba(10,16,32,.82)); box-shadow:0 18px 60px rgba(0,0,0,.75); overflow:hidden;">
+      <div style="padding:14px 16px; border-bottom:1px solid rgba(255,255,255,.10); display:flex; align-items:center; justify-content:space-between; gap:12px; background: rgba(124,58,237,.15);">
+        <div style="font-weight:950; letter-spacing:.2px; font-size:16px;">👋 Welcome to Block Legends!</div>
+        <button id="alexClose" class="btn small" onclick="window.__blAlexClose && window.__blAlexClose()" style="opacity:.9">Skip Intro</button>
+      </div>
+      
+      <div id="alexContent" style="padding:20px; max-height: 70vh; overflow-y: auto;">
+        <!-- Content will be dynamically loaded here -->
+      </div>
+      
+      <div style="padding:16px; border-top:1px solid rgba(255,255,255,.10); background: rgba(0,0,0,.2);">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="width:40px; height:40px; border-radius:12px; background: rgba(124,58,237,.2); border:1px solid rgba(124,58,237,.4); display:flex; align-items:center; justify-content:center; font-weight:950;">🤝</div>
+            <div>
+              <div style="font-weight:850; font-size:13px;">Alex · Your Business Mentor</div>
+              <div style="font-size:11px; opacity:.7;">I'm here to guide your entrepreneurial journey</div>
+            </div>
+          </div>
+          <button id="alexNext" class="btn brand" onclick="window.__blAlexNext && window.__blAlexNext()" style="display:none;">Continue →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alex Floating Button -->
+  <div id="alexFloatingBtn" style="display:none;">
+    🤝
+  </div>
 
   <!-- Terms + Analytics Consent Gate (shown once per device) -->
   <div id="tcOverlay" style="
@@ -500,7 +635,7 @@ const $$ = (id)=>document.getElementById(id);
       </div>
 
       <p style="opacity:0.8; margin:14px 0 0 0; font-size:13px;">
-        Tip: “Add to Home Screen” improves reliability on mobile.
+        Tip: "Add to Home Screen" improves reliability on mobile.
       </p>
     </div>
   </div>
@@ -515,11 +650,11 @@ const $$ = (id)=>document.getElementById(id);
         </div>
       </div>
       <div class="barBtns">
+        <button class="btn brand" id="btnAlexHelp">💬 Ask Alex</button>
         <button class="btn" id="btnHome">Home</button>
         <button class="btn" id="btnHow">How to Play</button>
         <button class="btn" id="btnProfile">Owner/Business</button>
         <button class="btn" id="btnReport">Report</button>
-        <button class="btn" id="btnExport">Export</button>
         <button class="btn danger" id="btnReset">Reset</button>
       </div>
     </div>
@@ -550,7 +685,6 @@ const $$ = (id)=>document.getElementById(id);
             </div>
           </div>
 
-
           <div class="box">
             <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
               <span class="pill brand" id="locPill">Locations: 1</span>
@@ -579,7 +713,7 @@ const $$ = (id)=>document.getElementById(id);
       <div class="card">
         <div class="cardHeader">
           <h2 id="leftTitle">Block Legends Hub</h2>
-          <div class="hint" id="leftHint">Start here. Hustle Match is your “work shift.”</div>
+          <div class="hint" id="leftHint">Start here. Hustle Match is your "work shift."</div>
         </div>
 
         <div class="cardBody view active" id="viewHub">
@@ -587,6 +721,7 @@ const $$ = (id)=>document.getElementById(id);
             <div class="tab active" data-tab="hub" id="tabHub">Hub</div>
             <div class="tab" data-tab="upgrades" id="tabUpgrades">Upgrades</div>
             <div class="tab" data-tab="opps" id="tabOpps">Opportunities</div>
+            <div class="tab" data-tab="loans" id="tabLoans">Loans & Credit</div>
           </div>
 
           <div id="hubTab">
@@ -606,6 +741,7 @@ const $$ = (id)=>document.getElementById(id);
                   <button class="btn brand" id="btnStartShift">Start Shift (Hustle Match)</button>
                   <button class="btn" id="btnViewUpgrades">View Upgrades</button>
                   <button class="btn" id="btnViewOpps">View Opportunities</button>
+                  <button class="btn" id="btnViewLoans">View Loans</button>
                 </div>
               </div>
 
@@ -666,26 +802,35 @@ const $$ = (id)=>document.getElementById(id);
             <div class="box">
               <div style="font-weight:950; margin-bottom:6px;">Opportunities (Pros + Cons)</div>
               <div class="note">
-                These are business choices with consequences. You’ll see the pros/cons and exact stat changes before you commit.
+                These are business choices with consequences. You'll see the pros/cons and exact stat changes before you commit.
               </div>
               <div class="list" style="margin-top:10px" id="oppsList"></div>
             </div>
           </div>
+          
+          <div id="loansTab" style="display:none">
+            <div class="box">
+              <div style="font-weight:950; margin-bottom:6px;">Business Loans & Credit</div>
+              <div class="note">
+                Build your business credit to access better loan terms. Loans can accelerate growth but require careful management.
+              </div>
+              <div class="list" style="margin-top:10px" id="loansList"></div>
+            </div>
+          </div>
         </div>
 
-            <div class="box">
-              <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
-                <div>
-                  <div style="font-weight:950; margin-bottom:6px;">Business Report (Quick)</div>
-                  <div class="note" id="reportSummary">—</div>
-                </div>
-                <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                  <button class="btn" id="btnOpenReport">Open Full Report</button>
-                  <span class="pill gray" id="adminCyclePill">Admin Day: in 3 shifts</span>
-                </div>
-              </div>
+        <div class="box">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+            <div>
+              <div style="font-weight:950; margin-bottom:6px;">Business Report (Quick)</div>
+              <div class="note" id="reportSummary">—</div>
             </div>
-
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="btn" id="btnOpenReport">Open Full Report</button>
+              <span class="pill gray" id="adminCyclePill">Admin Day: in 3 shifts</span>
+            </div>
+          </div>
+        </div>
 
         <div class="cardBody view" id="viewMatch">
           <div class="hud">
@@ -745,8 +890,6 @@ const $$ = (id)=>document.getElementById(id);
           </div>
         </div>
       </div>
-
-      
     </div>
   </div>
 
@@ -762,9 +905,100 @@ const $$ = (id)=>document.getElementById(id);
   </div>
 
   <div class="toast" id="toast"></div>
+  
+  <!-- Audio Toggle Button -->
+  <div class="audio-toggle" id="audioToggle" title="Toggle sound effects">🔊</div>
 
 <script>
-const LS = "block_legends_mvp_v3_progression";
+// ==================== AUDIO SYSTEM ====================
+const AudioSystem = {
+  enabled: true,
+  sounds: {},
+  
+  init: function() {
+    // Create audio elements
+    const sounds = {
+      click: 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ',
+      success: 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ',
+      error: 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ',
+      coin: 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ',
+      match: 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ'
+    };
+    
+    // Try to load from localStorage
+    const audioPref = localStorage.getItem('bl_audio_enabled');
+    this.enabled = audioPref === null ? true : audioPref === 'yes';
+    
+    // Update toggle button
+    const toggle = document.getElementById('audioToggle');
+    if(toggle) {
+      toggle.textContent = this.enabled ? '🔊' : '🔇';
+      toggle.onclick = () => this.toggle();
+    }
+  },
+  
+  play: function(soundName) {
+    if(!this.enabled) return;
+    
+    try {
+      // Simple beep sounds using Web Audio API
+      const context = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = context.createOscillator();
+      const gainNode = context.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(context.destination);
+      
+      switch(soundName) {
+        case 'click':
+          oscillator.frequency.setValueAtTime(800, context.currentTime);
+          gainNode.gain.setValueAtTime(0.1, context.currentTime);
+          break;
+        case 'success':
+          oscillator.frequency.setValueAtTime(1200, context.currentTime);
+          gainNode.gain.setValueAtTime(0.15, context.currentTime);
+          break;
+        case 'error':
+          oscillator.frequency.setValueAtTime(400, context.currentTime);
+          gainNode.gain.setValueAtTime(0.2, context.currentTime);
+          break;
+        case 'coin':
+          oscillator.frequency.setValueAtTime(1500, context.currentTime);
+          oscillator.frequency.exponentialRampToValueAtTime(800, context.currentTime + 0.1);
+          gainNode.gain.setValueAtTime(0.2, context.currentTime);
+          break;
+        case 'match':
+          oscillator.frequency.setValueAtTime(600, context.currentTime);
+          oscillator.frequency.exponentialRampToValueAtTime(1200, context.currentTime + 0.1);
+          gainNode.gain.setValueAtTime(0.25, context.currentTime);
+          break;
+      }
+      
+      oscillator.start();
+      gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.1);
+      oscillator.stop(context.currentTime + 0.1);
+    } catch(e) {
+      console.log('Audio not supported');
+    }
+  },
+  
+  toggle: function() {
+    this.enabled = !this.enabled;
+    localStorage.setItem('bl_audio_enabled', this.enabled ? 'yes' : 'no');
+    
+    const toggle = document.getElementById('audioToggle');
+    if(toggle) {
+      toggle.textContent = this.enabled ? '🔊' : '🔇';
+      this.play('click');
+    }
+  }
+};
+
+// Initialize audio system
+AudioSystem.init();
+
+// ==================== MAIN GAME CODE ====================
+const LS = "block_legends_mvp_v4_progression";
 
 const CONSENT_KEY = "bl_consent_v1";
 const ANALYTICS_KEY = "bl_analytics_enabled_v1";
@@ -846,6 +1080,1061 @@ function trackEvent(name, props={}){
   }catch{}
 }
 
+// ==================== ALEX MENTOR SYSTEM ====================
+const AlexMentor = {
+  userLevel: 1,
+  lastAdviceGiven: null,
+  adviceHistory: [],
+  
+  init: function() {
+    this.calculateUserLevel();
+    this.updateFloatingButton();
+    this.trackMilestones();
+  },
+  
+  calculateUserLevel: function() {
+    const state = window.state || {};
+    const shifts = state.shiftsCompleted || 0;
+    const cash = state.cash || 0;
+    const bizLevel = state.bizLevel || 1;
+    
+    if (shifts < 3 && cash < 100) this.userLevel = 1;
+    else if (shifts >= 3 && cash >= 100 && cash < 500) this.userLevel = 2;
+    else if (shifts >= 10 && cash >= 500 && bizLevel >= 2) this.userLevel = 3;
+    else this.userLevel = 4;
+  },
+  
+  updateFloatingButton: function() {
+    const btn = document.getElementById('alexFloatingBtn');
+    if (!btn) return;
+    
+    if (state.view !== 'match' && !state.inShift) {
+      btn.style.display = 'flex';
+    } else {
+      btn.style.display = 'none';
+    }
+    
+    btn.onclick = () => this.showContextualAdvice();
+  },
+  
+  trackMilestones: function() {
+    const milestones = [
+      { check: () => state.cash >= 100, type: 'first_100', advice: 'cash_milestone' },
+      { check: () => state.bizLevel >= 2, type: 'biz_expansion', advice: 'expansion_milestone' },
+      { check: () => state.legal?.llc, type: 'llc_formed', advice: 'legal_milestone' },
+      { check: () => state.locations >= 2, type: 'second_location', advice: 'location_milestone' },
+      { check: () => state.creditScore >= 700, type: 'good_credit', advice: 'credit_milestone' },
+      { check: () => state.activeLoans?.length > 0, type: 'first_loan', advice: 'loan_milestone' }
+    ];
+    
+    milestones.forEach(milestone => {
+      if (milestone.check() && !this.adviceHistory.includes(milestone.type)) {
+        this.giveMilestoneAdvice(milestone.advice, milestone.type);
+      }
+    });
+  },
+  
+  startInteractiveOnboarding: function() {
+    if (state.tutorialSeen) return;
+    
+    const overlay = document.getElementById('alexOverlay');
+    const content = document.getElementById('alexContent');
+    const nextBtn = document.getElementById('alexNext');
+    
+    if (!overlay || !content) return;
+    
+    const onboardingFlow = [
+      {
+        id: 'welcome',
+        title: 'Welcome to Block Legends',
+        content: `
+          <div style="text-align: center; padding: 20px 0;">
+            <div style="font-size: 48px; margin-bottom: 20px;">🤝</div>
+            <div style="font-size: 24px; font-weight: 950; margin-bottom: 16px; color: #c4b5fd;">I'm Alex, Your Business Mentor</div>
+            <div style="color: var(--text); line-height: 1.6; margin-bottom: 24px;">
+              I've built businesses from the ground up, just like you're about to. 
+              I'll guide you through every step of this journey - from your first shift 
+              to running a multi-location empire.
+            </div>
+          </div>
+          
+          <div style="display: grid; gap: 12px; margin: 24px 0;">
+            <div class="alex-option" data-choice="purpose">
+              <div style="font-weight: 850; margin-bottom: 4px;">🎯 What's the purpose of this game?</div>
+              <div style="font-size: 12px; color: var(--muted);">Understand the real-world business simulation</div>
+            </div>
+            
+            <div class="alex-option" data-choice="quickstart">
+              <div style="font-weight: 850; margin-bottom: 4px;">🚀 I'm ready, let's jump in!</div>
+              <div style="font-size: 12px; color: var(--muted);">Skip to setting up my business</div>
+            </div>
+            
+            <div class="alex-option" data-choice="detailed">
+              <div style="font-weight: 850; margin-bottom: 4px;">📚 I want a detailed breakdown</div>
+              <div style="font-size: 12px; color: var(--muted);">Step-by-step explanation of everything</div>
+            </div>
+          </div>
+        `,
+        showNext: false
+      },
+      {
+        id: 'purpose',
+        title: 'The Real Business Journey',
+        content: `
+          <div class="alex-response">
+            <div style="font-weight: 850; margin-bottom: 12px; color: #34d399;">This isn't just a game - it's a business simulator.</div>
+            <div style="line-height: 1.6; margin-bottom: 20px;">
+              <b>You're building Trap to Table</b>, a real business that:<br/><br/>
+              1. <b>Earns money through work</b> (Hustle Match shifts)<br/>
+              2. <b>Invests in growth</b> (Upgrades & Expansion)<br/>
+              3. <b>Makes strategic decisions</b> (Opportunities)<br/>
+              4. <b>Manages risk & reputation</b> (Legal & Insurance)<br/>
+              5. <b>Scales sustainably</b> (Locations & Staff)<br/><br/>
+              
+              Every choice affects your Cash, Reputation, and Demand. 
+              Balance all three to succeed.
+            </div>
+            
+            <div style="background: rgba(251,191,36,.1); border: 1px solid rgba(251,191,36,.3); border-radius: 12px; padding: 12px; margin: 16px 0;">
+              <div style="font-weight: 850; margin-bottom: 8px; color: #fbbf24;">💰 Your First Goal</div>
+              <div style="font-size: 13px;">
+                1. Run 3 shifts to earn startup cash<br/>
+                2. Set up basic legal structure<br/>
+                3. Expand to Business Level 2<br/>
+                4. Hire your first accountant when you can afford it
+              </div>
+            </div>
+          </div>
+          
+          <div style="display: grid; gap: 12px; margin-top: 24px;">
+            <div class="alex-option" data-choice="moneyflow">
+              <div style="font-weight: 850; margin-bottom: 4px;">💰 Explain the money flow</div>
+              <div style="font-size: 12px; color: var(--muted);">How cash, rep, and demand work together</div>
+            </div>
+            
+            <div class="alex-option" data-choice="shifts">
+              <div style="font-weight: 850; margin-bottom: 4px;">🎮 Tell me about Hustle Match</div>
+              <div style="font-size: 12px; color: var(--muted);">How shifts earn money</div>
+            </div>
+            
+            <div class="alex-option" data-choice="ready">
+              <div style="font-weight: 850; margin-bottom: 4px;">👍 I'm ready to start</div>
+              <div style="font-size: 12px; color: var(--muted);">Let's set up my business</div>
+            </div>
+          </div>
+        `,
+        showNext: false
+      },
+      {
+        id: 'quickstart',
+        title: 'Quick Start Setup',
+        content: `
+          <div class="alex-response">
+            <div style="font-weight: 850; margin-bottom: 12px; color: #34d399;">Perfect! Here's what you need to know:</div>
+            <div style="line-height: 1.6; margin-bottom: 20px;">
+              1. <b>Start with a shift</b> → Earn immediate cash<br/>
+              2. <b>Invest in packaging first</b> → Protects reputation<br/>
+              3. <b>Get an EIN</b> → It's free and helps with banking<br/>
+              4. <b>Watch your rep</b> → Never let it drop below 45<br/>
+              5. <b>Upgrade staff</b> → When you're consistently winning shifts<br/><br/>
+              
+              I'll pop up with advice as you progress. Use the "Ask Alex" button anytime.
+            </div>
+          </div>
+        `,
+        showNext: true
+      },
+      {
+        id: 'detailed',
+        title: 'Complete Breakdown',
+        content: `
+          <div style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
+            <div class="alex-response" style="margin-bottom: 16px;">
+              <div style="font-weight: 850; margin-bottom: 8px; color: #34d399;">🏢 The Hub (Your Business Dashboard)</div>
+              <div style="line-height: 1.5; font-size: 13px;">
+                • <b>Business Snapshot</b>: Cash, Reputation, Demand<br/>
+                • <b>Upgrades</b>: Repeatable improvements (packaging, staff, etc.)<br/>
+                • <b>Opportunities</b>: Strategic decisions with pros/cons<br/>
+                • <b>Loans & Credit</b>: Financing options for growth<br/>
+                • <b>Expansion</b>: Level up your business when ready
+              </div>
+            </div>
+            
+            <div class="alex-response" style="margin-bottom: 16px;">
+              <div style="font-weight: 850; margin-bottom: 8px; color: #34d399;">🎮 Hustle Match (Your Work Shift)</div>
+              <div style="line-height: 1.5; font-size: 13px;">
+                • Clear tiles to earn <b>Shift Pay</b> (immediate money)<br/>
+                • Hit Bad Reviews twice to remove them<br/>
+                • Deliver crates to bottom row<br/>
+                • Make 4+ matches for special power-ups<br/>
+                • Win the shift to collect all earnings + bonus
+              </div>
+            </div>
+            
+            <div class="alex-response" style="margin-bottom: 16px;">
+              <div style="font-weight: 850; margin-bottom: 8px; color: #34d399;">📈 Progression Systems</div>
+              <div style="line-height: 1.5; font-size: 13px;">
+                • <b>Business Levels</b>: Unlock new upgrades/opportunities<br/>
+                • <b>Operation Stages</b>: Home-based → Food Truck → Storefront<br/>
+                • <b>Legal Structure</b>: Sole Prop → DBA → LLC<br/>
+                • <b>Locations</b>: Open new stores in different cities<br/>
+                • <b>Credit Score</b>: Affects loan terms and opportunities
+              </div>
+            </div>
+            
+            <div class="alex-response">
+              <div style="font-weight: 850; margin-bottom: 8px; color: #34d399;">👥 Team Building (Coming Soon)</div>
+              <div style="line-height: 1.5; font-size: 13px;">
+                • <b>Accountant</b>: Financial advice & tax optimization<br/>
+                • <b>Manager</b>: Reduces admin work & manages staff<br/>
+                • <b>Marketing Lead</b>: Boosts demand growth<br/>
+                • <b>Legal Counsel</b>: Better deal negotiations<br/><br/>
+                
+                <i>Remember: Every hire costs money. Only hire when you can sustain the expense.</i>
+              </div>
+            </div>
+          </div>
+          
+          <div style="margin-top: 20px;">
+            <div class="alex-option" data-choice="ready">
+              <div style="font-weight: 850; margin-bottom: 4px;">👍 Got it, let's start!</div>
+              <div style="font-size: 12px; color: var(--muted);">I'm ready to build my business</div>
+            </div>
+          </div>
+        `,
+        showNext: false
+      },
+      {
+        id: 'ready',
+        title: "Let's Get Started!",
+        content: `
+          <div class="alex-response">
+            <div style="font-weight: 850; margin-bottom: 12px; color: #34d399;">Perfect! Time to set up your business.</div>
+            <div style="line-height: 1.6; margin-bottom: 20px;">
+              You'll need to:<br/><br/>
+              1. <b>Name your business</b> and yourself as owner<br/>
+              2. <b>Choose your location</b> (city, state, country)<br/>
+              3. <b>Start with basic legal setup</b> (we'll get an EIN first - it's free!)<br/>
+              4. <b>Consider basic insurance</b> to protect against bad luck<br/><br/>
+              
+              I'll be here every step of the way. Use my advice button anytime you're stuck.
+            </div>
+          </div>
+        `,
+        showNext: true
+      }
+    ];
+    
+    let currentStep = 0;
+    let userPath = [];
+    
+    function showStep(stepId) {
+      const step = onboardingFlow.find(s => s.id === stepId);
+      if (!step) {
+        finishOnboarding();
+        return;
+      }
+      
+      if (!userPath.includes(stepId)) {
+        userPath.push(stepId);
+      }
+      
+      content.innerHTML = step.content;
+      nextBtn.style.display = step.showNext ? 'block' : 'none';
+      
+      setTimeout(() => {
+        content.querySelectorAll('.alex-option').forEach(option => {
+          option.onclick = function() {
+            const choice = this.dataset.choice;
+            AudioSystem.play('click');
+            showStep(choice);
+          };
+        });
+      }, 100);
+    }
+    
+    function finishOnboarding() {
+      state.tutorialSeen = true;
+      saveState();
+      overlay.style.display = 'none';
+      AudioSystem.play('success');
+      
+      setTimeout(() => {
+        showProfileSetup(true);
+      }, 500);
+    }
+    
+    window.__blAlexNext = function() {
+      if (onboardingFlow[currentStep + 1]) {
+        currentStep++;
+        showStep(onboardingFlow[currentStep].id);
+      } else {
+        finishOnboarding();
+      }
+      AudioSystem.play('click');
+    };
+    
+    window.__blAlexClose = function() {
+      finishOnboarding();
+      AudioSystem.play('click');
+    };
+    
+    overlay.style.display = 'flex';
+    showStep('welcome');
+    document.getElementById('alexClose').onclick = window.__blAlexClose;
+  },
+  
+  showContextualAdvice: function() {
+    let advice = '';
+    let title = 'Alex\'s Advice';
+    
+    if (state.view === 'hub') {
+      if (state.activeHubTab === 'hub') {
+        advice = this.getHubAdvice();
+        title = 'Hub Strategy';
+      } else if (state.activeHubTab === 'upgrades') {
+        advice = this.getUpgradesAdvice();
+        title = 'Upgrade Strategy';
+      } else if (state.activeHubTab === 'opps') {
+        advice = this.getOpportunitiesAdvice();
+        title = 'Opportunity Strategy';
+      } else if (state.activeHubTab === 'loans') {
+        advice = this.getLoansAdvice();
+        title = 'Loan Strategy';
+      }
+    } else if (state.view === 'match') {
+      advice = this.getShiftAdvice();
+      title = 'Shift Strategy';
+    }
+    
+    openModal(
+      title,
+      advice,
+      [
+        {label: 'Ask Specific Question', onClick: () => { 
+          closeModal(); 
+          setTimeout(() => this.showAdviceMenu(), 100); 
+        }},
+        {label: 'Close', kind: 'brand', onClick: closeModal}
+      ]
+    );
+  },
+  
+  getHubAdvice: function() {
+    const expChk = canExpand();
+    const stageChk = canAdvanceStage();
+    
+    if (this.userLevel === 1) {
+      return `
+        <div class="alex-response">
+          <div style="font-weight: 850; margin-bottom: 12px; color: #34d399;">Focus on Foundation</div>
+          <div style="line-height: 1.6;">
+            <b>Right now:</b><br/><br/>
+            1. <b>Run 3 shifts</b> to build cash cushion<br/>
+            2. <b>Upgrade packaging to Level 2</b> first<br/>
+            3. <b>Get free EIN</b> from profile setup<br/>
+            4. <b>Avoid loans</b> until you're consistently earning<br/><br/>
+            
+            <i>Cash target: $150 before considering expansion.</i>
+          </div>
+        </div>
+      `;
+    } else if (this.userLevel === 2) {
+      return `
+        <div class="alex-response">
+          <div style="font-weight: 850; margin-bottom: 12px; color: #34d399;">Time to Grow</div>
+          <div style="line-height: 1.6;">
+            <b>Ready for:</b><br/><br/>
+            ${expChk.ok ? '✅ <b>Expand business now</b><br/>' : '❌ <b>Not ready to expand yet</b><br/>'}
+            ${stageChk.ok ? '✅ <b>Consider stage upgrade</b><br/>' : '❌ <b>Wait on stage upgrade</b><br/>'}
+            <br/>
+            <b>Next moves:</b><br/>
+            1. ${expChk.ok ? 'Expand immediately' : 'Focus on weakest requirement'}<br/>
+            2. Consider LLC if planning storefront soon<br/>
+            3. Staff upgrades help with demand growth<br/><br/>
+            
+            <i>Target Business Level 3 before opening second location.</i>
+          </div>
+        </div>
+      `;
+    }
+    
+    return this.getGeneralAdvice();
+  },
+  
+  getUpgradesAdvice: function() {
+    const upgrades = state.upgrades || {};
+    
+    const suggestions = [];
+    if ((upgrades.packaging || 0) < 3) suggestions.push('Packaging');
+    if ((upgrades.staff || 0) < 2) suggestions.push('Staff');
+    if (state.bizLevel >= 2 && (upgrades.marketing || 0) < 1) suggestions.push('Marketing');
+    if (state.bizLevel >= 2 && (upgrades.equipment || 0) < 1) suggestions.push('Equipment');
+    
+    return `
+      <div class="alex-response">
+        <div style="font-weight: 850; margin-bottom: 12px; color: #34d399;">Upgrade Priority</div>
+        <div style="line-height: 1.6;">
+          <b>Current levels:</b><br/>
+          • Packaging: Level ${upgrades.packaging || 0}<br/>
+          • Staff: Level ${upgrades.staff || 0}<br/>
+          • Marketing: Level ${upgrades.marketing || 0}<br/>
+          • Equipment: Level ${upgrades.equipment || 0}<br/><br/>
+          
+          <b>${suggestions.length > 0 ? 'Priority upgrades:' : 'All upgrades at good levels!'}</b><br/>
+          ${suggestions.map(s => `• <b>${s}</b> - ${this.getUpgradeReason(s)}`).join('<br/>')}<br/><br/>
+          
+          <i>Equipment gives best ROI for shift earnings. Marketing is risky before good packaging.</i>
+        </div>
+      </div>
+    `;
+  },
+  
+  getUpgradeReason: function(upgrade) {
+    const reasons = {
+      'Packaging': 'Protects reputation (your most valuable asset)',
+      'Staff': 'Makes shifts easier and boosts demand growth',
+      'Marketing': 'Grows demand fast but can overwhelm quality',
+      'Equipment': 'Directly increases money earned per tile'
+    };
+    return reasons[upgrade] || 'Important for balanced growth';
+  },
+  
+  getOpportunitiesAdvice: function() {
+    return `
+      <div class="alex-response">
+        <div style="font-weight: 850; margin-bottom: 12px; color: #34d399;">Opportunity Strategy</div>
+        <div style="line-height: 1.6;">
+          <b>General rules:</b><br/><br/>
+          1. <b>Never sacrifice reputation for quick cash</b> unless desperate<br/>
+          2. <b>Check expansion requirements</b> before taking reputation hits<br/>
+          3. <b>Cash-heavy opportunities</b> are great before big purchases<br/>
+          4. <b>Demand-heavy opportunities</b> require good packaging/staff<br/><br/>
+          
+          <i>If your reputation is below 60, avoid any opportunity that reduces it.
+          If above 70, you can take calculated risks.</i>
+        </div>
+      </div>
+    `;
+  },
+  
+  getLoansAdvice: function() {
+    const creditTier = getCreditTier(state.creditScore || 650);
+    const loanEffects = state.loanEffects || {};
+    
+    return `
+      <div class="alex-response">
+        <div style="font-weight: 850; margin-bottom: 12px; color: #34d399;">Loan Strategy</div>
+        <div style="line-height: 1.6;">
+          <b>Your credit:</b> ${state.creditScore} (${creditTier.name})<br/>
+          <b>Active loans:</b> ${state.activeLoans?.length || 0}<br/>
+          <b>Monthly payments:</b> ${currency(loanEffects.monthlyPayments || 0)}<br/>
+          <b>Debt-to-income:</b> ${((loanEffects.debtToIncomeRatio || 0) * 100).toFixed(1)}%<br/><br/>
+          
+          <b>${this.userLevel < 3 ? 'For your stage:' : 'Advanced advice:'}</b><br/>
+          ${this.userLevel < 3 ? 
+            'Avoid loans until Business Level 3. Focus on organic growth first.' : 
+            'Consider equipment loans for ROI. Avoid multiple overlapping loans.'}<br/><br/>
+          
+          <i>Never let debt payments exceed 40% of estimated monthly income.
+          Paying loans early boosts credit significantly.</i>
+        </div>
+      </div>
+    `;
+  },
+  
+  getShiftAdvice: function() {
+    const lvl = getNextShiftLevel();
+    
+    return `
+      <div class="alex-response">
+        <div style="font-weight: 850; margin-bottom: 12px; color: #34d399;">Shift ${lvl.id} Strategy</div>
+        <div style="line-height: 1.6;">
+          <b>Goals:</b> ${winLineForLevel(lvl)}<br/>
+          <b>Moves:</b> ${state.movesLeft || lvl.moves}<br/><br/>
+          
+          <b>Priority order:</b><br/>
+          1. Clear reviews near crates first<br/>
+          2. Create matches at bottom for crate delivery<br/>
+          3. Save bombs for clustered reviews<br/>
+          4. Use promos to create row/column clears near bottom<br/><br/>
+          
+          <i>Target earnings: $${Math.round(80 * earningsMultiplier())} per shift minimum.
+          Equipment level ${state.upgrades?.equipment || 0} gives +${((state.upgrades?.equipment || 0) * 3)}% earnings.</i>
+        </div>
+      </div>
+    `;
+  },
+  
+  showAdviceMenu: function() {
+    openModal(
+      "Ask Alex - Specific Questions",
+      `
+        <div style="display: grid; gap: 10px;">
+          <div class="alex-option" data-topic="cashflow">
+            <div style="font-weight: 850; margin-bottom: 4px;">💰 Cash Flow Management</div>
+            <div style="font-size: 12px; color: var(--muted);">Balancing income, expenses, and investments</div>
+          </div>
+          
+          <div class="alex-option" data-topic="reputation">
+            <div style="font-weight: 850; margin-bottom: 4px;">⭐ Building & Protecting Reputation</div>
+            <div style="font-size: 12px; color: var(--muted);">Your business's most valuable asset</div>
+          </div>
+          
+          <div class="alex-option" data-topic="expansion">
+            <div style="font-weight: 850; margin-bottom: 4px;">📈 When to Expand Business</div>
+            <div style="font-size: 12px; color: var(--muted);">Timing growth correctly</div>
+          </div>
+          
+          <div class="alex-option" data-topic="legal">
+            <div style="font-weight: 850; margin-bottom: 4px;">⚖️ Legal Structure Advice</div>
+            <div style="font-size: 12px; color: var(--muted);">DBA, EIN, LLC - when and why</div>
+          </div>
+          
+          <div class="alex-option" data-topic="locations">
+            <div style="font-weight: 850; margin-bottom: 4px;">🏪 Opening New Locations</div>
+            <div style="font-size: 12px; color: var(--muted);">Multi-location strategy</div>
+          </div>
+          
+          <div class="alex-option" data-topic="staff">
+            <div style="font-weight: 850; margin-bottom: 4px;">👥 Hiring & Team Building</div>
+            <div style="font-size: 12px; color: var(--muted);">When to hire accountant/manager</div>
+          </div>
+          
+          <div class="alex-option" data-topic="shifts">
+            <div style="font-weight: 850; margin-bottom: 4px;">🎮 Advanced Shift Strategies</div>
+            <div style="font-size: 12px; color: var(--muted);">Maximizing shift earnings</div>
+          </div>
+          
+          <div class="alex-option" data-topic="loans">
+            <div style="font-weight: 850; margin-bottom: 4px;">🏦 Smart Loan Management</div>
+            <div style="font-size: 12px; color: var(--muted);">Debt strategy and credit building</div>
+          </div>
+        </div>
+      `,
+      [{label: "Close", onClick: closeModal}]
+    );
+    
+    setTimeout(() => {
+      document.querySelectorAll('.alex-option[data-topic]').forEach(option => {
+        option.onclick = () => {
+          const topic = option.dataset.topic;
+          this.showDetailedAdvice(topic);
+        };
+      });
+    }, 100);
+  },
+  
+  showDetailedAdvice: function(topic) {
+    const adviceMap = {
+      cashflow: {
+        title: "💰 Cash Flow Management",
+        content: `
+          <div class="alex-response">
+            <div style="font-weight: 850; margin-bottom: 12px; color: #34d399;">Cash is Oxygen - Manage it Wisely</div>
+            <div style="line-height: 1.6;">
+              <b>For your level (${this.userLevel}):</b><br/><br/>
+              ${this.userLevel === 1 ? 
+                '• Keep minimum $100 buffer at all times<br/>' +
+                '• Avoid all unnecessary expenses<br/>' +
+                '• Focus on shift earnings, not opportunities<br/>' +
+                '• Get free EIN first, wait on paid legal steps' :
+              this.userLevel === 2 ?
+                '• Maintain $300-500 operating buffer<br/>' +
+                '• Invest in equipment for ROI<br/>' +
+                '• Consider basic insurance if demand > 60<br/>' +
+                '• Time big purchases after admin day' :
+                '• Use loans strategically for growth<br/>' +
+                '• Keep debt-to-income under 40%<br/>' +
+                '• Hire accountant when monthly expenses > $800<br/>' +
+                '• Reinvest 30% of profits back into business'
+              }<br/><br/>
+              
+              <b>Golden Rules:</b><br/>
+              1. Never spend last $50<br/>
+              2. Track ledger for spending patterns<br/>
+              3. Plan purchases around admin day cycle<br/>
+              4. Equipment upgrades give best cash ROI<br/><br/>
+              
+              <i>"Revenue is vanity, profit is sanity, cash is reality."</i>
+            </div>
+          </div>
+        `
+      },
+      reputation: {
+        title: "⭐ Reputation Management",
+        content: `
+          <div class="alex-response">
+            <div style="font-weight: 850; margin-bottom: 12px; color: #34d399;">Your Business's Most Valuable Asset</div>
+            <div style="line-height: 1.6;">
+              <b>Current status:</b> ${state.rep}/100 (${state.rep < 45 ? '⚠️ Needs attention' : state.rep < 60 ? '⚠️ Okay' : '✅ Good'})<br/><br/>
+              
+              <b>${this.userLevel === 1 ? 'Foundation building:' : 'Advanced management:'}</b><br/>
+              ${this.userLevel === 1 ?
+                '• Upgrade packaging to Level 3 first<br/>' +
+                '• Clear reviews early in shifts<br/>' +
+                '• Avoid opportunities that hurt rep<br/>' +
+                '• Target rep 60 before heavy marketing' :
+                '• Maintain rep above 70 for best opportunities<br/>' +
+                '• Use packaging as reputation shield<br/>' +
+                '• Consider insurance if demand outpaces rep<br/>' +
+                '• Staff training reduces reputation hits'
+              }<br/><br/>
+              
+              <b>Emergency recovery (if rep < 40):</b><br/>
+              1. Stop all marketing spend<br/>
+              2. Focus on packaging upgrades<br/>
+              3. Take reputation-positive opportunities<br/>
+              4. Run shifts focusing on review clearance<br/><br/>
+              
+              <i>It takes 20 good shifts to build reputation, 2 bad decisions to destroy it.</i>
+            </div>
+          </div>
+        `
+      },
+      expansion: {
+        title: "📈 Business Expansion Strategy",
+        content: `
+          <div class="alex-response">
+            <div style="font-weight: 850; margin-bottom: 12px; color: #34d399;">Grow at the Right Pace</div>
+            <div style="line-height: 1.6;">
+              <b>Current level:</b> ${state.bizLevel} • ${currentBiz().name}<br/>
+              <b>Next level ready:</b> ${canExpand().ok ? '✅ Yes' : '❌ No'}<br/><br/>
+              
+              <b>${this.userLevel < 3 ? 'Conservative approach:' : 'Aggressive approach:'}</b><br/>
+              ${this.userLevel < 3 ?
+                '• Expand only when 150% of cash requirement met<br/>' +
+                '• Keep rep 10+ points above requirement<br/>' +
+                '• Max out current level upgrades first<br/>' +
+                '• Have LLC before storefront stage' :
+                '• Use loans to accelerate expansion<br/>' +
+                '• Expand when 120% of requirements met<br/>' +
+                '• Plan expansion around staff availability<br/>' +
+                '• Consider hiring manager before big expansion'
+              }<br/><br/>
+              
+              <b>Warning signs (don't expand if):</b><br/>
+              1. Reputation below requirement + 5<br/>
+              2. Cash buffer less than $100 after expansion<br/>
+              3. Equipment level below 3<br/>
+              4. Active loans with high payments<br/><br/>
+              
+              <i>Expanding too early is the #1 reason businesses struggle here.
+              Get the fundamentals right first.</i>
+            </div>
+          </div>
+        `
+      },
+      legal: {
+        title: "⚖️ Legal Structure Strategy",
+        content: `
+          <div class="alex-response">
+            <div style="font-weight: 850; margin-bottom: 12px; color: #34d399;">Build Your Legal Foundation</div>
+            <div style="line-height: 1.6;">
+              <b>Current status:</b> ${legalLabel()}<br/>
+              ${state.legal?.dba ? '✅ DBA' : '❌ No DBA'} • 
+              ${state.legal?.ein ? '✅ EIN' : '❌ No EIN'} • 
+              ${state.legal?.llc ? '✅ LLC' : '❌ No LLC'}<br/><br/>
+              
+              <b>Recommended progression:</b><br/>
+              1. <b>EIN (Free)</b> - Get immediately<br/>
+              2. <b>DBA ($45)</b> - When cash > $200<br/>
+              3. <b>LLC ($250)</b> - Before Business Level 3<br/><br/>
+              
+              <b>Why LLC matters:</b><br/>
+              • Required for storefront stage<br/>
+              • Better loan terms (+20 credit score)<br/>
+              • Liability protection in opportunities<br/>
+              • Looks professional to partners<br/><br/>
+              
+              <b>${this.userLevel < 3 ? 'For now:' : 'Next steps:'}</b><br/>
+              ${!state.legal?.ein ? 'Get EIN now - it\'s free and helps immediately' :
+                !state.legal?.llc && state.bizLevel >= 2 ? 'Form LLC before Business Level 3' :
+                'Legal structure complete. Consider hiring legal counsel for better deals.'}<br/><br/>
+              
+              <i>Never operate long-term without at least DBA+EIN.
+              LLC is non-negotiable for serious growth.</i>
+            </div>
+          </div>
+        `
+      },
+      locations: {
+        title: "🏪 Multi-Location Strategy",
+        content: `
+          <div class="alex-response">
+            <div style="font-weight: 850; margin-bottom: 12px; color: #34d399;">Scaling Your Presence</div>
+            <div style="line-height: 1.6;">
+              <b>Current locations:</b> ${state.locations || 1}<br/>
+              <b>Can open new:</b> ${canOpenNextLocation().ok ? '✅ Yes' : '❌ No'}<br/><br/>
+              
+              <b>Requirements for success:</b><br/>
+              1. Storefront stage + LLC<br/>
+              2. Reputation > 70 (trust must travel)<br/>
+              3. Staff level > 4 (need management)<br/>
+              4. Cash buffer > $1000 after opening<br/>
+              5. Equipment level > 5 (consistency matters)<br/><br/>
+              
+              <b>${this.userLevel < 4 ? 'Preparation phase:' : 'Execution phase:'}</b><br/>
+              ${this.userLevel < 4 ?
+                '• Focus on mastering single location first<br/>' +
+                '• Build reputation to 80+<br/>' +
+                '• Save $1500+ specifically for expansion<br/>' +
+                '• Hire manager before opening second location' :
+                '• Open in cities with different demand patterns<br/>' +
+                '• Use location-specific marketing<br/>' +
+                '• Consider regional manager hire<br/>' +
+                '• Watch for reputation dilution across locations'
+              }<br/><br/>
+              
+              <i>Second location doubles problems before it doubles profits.
+              Master unit economics first.</i>
+            </div>
+          </div>
+        `
+      },
+      staff: {
+        title: "👥 Team Building Strategy",
+        content: `
+          <div class="alex-response">
+            <div style="font-weight: 850; margin-bottom: 12px; color: #34d399;">Building Your Team</div>
+            <div style="line-height: 1.6;">
+              <b>Current staff level:</b> ${state.upgrades?.staff || 0}<br/>
+              <b>Monthly staff cost:</b> ~${currency((state.upgrades?.staff || 0) * 18 * 4)}<br/><br/>
+              
+              <b>Hiring thresholds:</b><br/>
+              • <b>Accountant</b>: When monthly expenses > $800<br/>
+              • <b>Manager</b>: When locations > 1 OR staff level > 5<br/>
+              • <b>Marketing Lead</b>: When demand > 80 AND rep > 75<br/>
+              • <b>Legal Counsel</b>: When actively negotiating big deals<br/><br/>
+              
+              <b>Accountant benefits (when available):</b><br/>
+              1. Tax optimization (save 10-20% on expenses)<br/>
+              2. Better loan terms identification<br/>
+              3. Cash flow forecasting<br/>
+              4. Opportunity risk assessment<br/>
+              5. Expense reduction suggestions<br/><br/>
+              
+              <b>Remember:</b> Every hire increases fixed costs. 
+              Only hire when the ROI is clear and you can sustain the expense through slow periods.
+            </div>
+          </div>
+        `
+      },
+      shifts: {
+        title: "🎮 Advanced Shift Strategies",
+        content: `
+          <div class="alex-response">
+            <div style="font-weight: 850; margin-bottom: 12px; color: #34d399;">Maximizing Shift Earnings</div>
+            <div style="line-height: 1.6;">
+              <b>Equipment bonus:</b> +${((state.upgrades?.equipment || 0) * 3)}% per tile<br/>
+              <b>Business level bonus:</b> +${(state.bizLevel - 1) * 8}%<br/>
+              <b>Target per shift:</b> $${Math.round(100 * earningsMultiplier())}+<br/><br/>
+              
+              <b>Advanced techniques:</b><br/>
+              1. <b>Crate-first strategy</b>: Clear bottom rows first<br/>
+              2. <b>Review clustering</b>: Group reviews then use bomb<br/>
+              3. <b>Promo placement</b>: Place row/column clears at bottom<br/>
+              4. <b>Color clear timing</b>: Save for high-value colors<br/>
+              5. <b>Move efficiency</b>: Plan 2-3 moves ahead<br/><br/>
+              
+              <b>Equipment ROI:</b><br/>
+              Level 1: +3% earnings → pays for itself in ~8 shifts<br/>
+              Level 3: +9% earnings → pays for itself in ~5 shifts<br/>
+              Level 5: +15% earnings → pays for itself in ~3 shifts<br/><br/>
+              
+              <i>Focus on consistency over perfection. 
+              $80/Shift consistently beats $120/Shift occasionally.</i>
+            </div>
+          </div>
+        `
+      },
+      loans: {
+        title: "🏦 Smart Loan Management",
+        content: `
+          <div class="alex-response">
+            <div style="font-weight: 850; margin-bottom: 12px; color: #34d399;">Strategic Debt for Growth</div>
+            <div style="line-height: 1.6;">
+              <b>Your credit:</b> ${state.creditScore} (${getCreditTier(state.creditScore).name})<br/>
+              <b>Active loans:</b> ${state.activeLoans?.length || 0}<br/>
+              <b>Credit building rate:</b> ${this.getCreditBuildingRate()} points/week<br/><br/>
+              
+              <b>When to take loans:</b><br/>
+              1. Equipment purchase with clear ROI<br/>
+              2. Business expansion when requirements met<br/>
+              3. Emergency cash (last resort)<br/>
+              4. Strategic opportunity that needs quick cash<br/><br/>
+              
+              <b>Loan priority:</b><br/>
+              1. Equipment loan (best ROI)<br/>
+              2. Expansion loan (growth accelerator)<br/>
+              3. Starter loan (emergency only)<br/><br/>
+              
+              <b>Debt management rules:</b><br/>
+              1. Never exceed 40% debt-to-income<br/>
+              2. Pay on time (2-5 credit points)<br/>
+              3. Pay early when possible (10-15 credit points)<br/>
+              4. Avoid overlapping loan terms<br/>
+              5. Refinance when credit improves 50+ points<br/><br/>
+              
+              <i>Good debt grows your business, bad debt strangles it.
+              Know the difference before signing.</i>
+            </div>
+          </div>
+        `
+      }
+    };
+    
+    const advice = adviceMap[topic] || adviceMap.cashflow;
+    openModal(
+      advice.title,
+      advice.content,
+      [
+        {label: 'Back to Questions', onClick: () => { 
+          closeModal(); 
+          setTimeout(() => this.showAdviceMenu(), 100); 
+        }},
+        {label: 'Close', kind: 'brand', onClick: closeModal}
+      ]
+    );
+  },
+  
+  getCreditBuildingRate: function() {
+    const actions = [];
+    if (state.activeLoans?.length > 0) actions.push('loan_payment');
+    if (state.rep > 70) actions.push('good_rep');
+    if (state.cash > 500) actions.push('cash_reserve');
+    
+    return actions.length * 2 + 1;
+  },
+  
+  giveMilestoneAdvice: function(adviceType, milestone) {
+    if (this.adviceHistory.includes(milestone)) return;
+    
+    this.adviceHistory.push(milestone);
+    
+    const messages = {
+      cash_milestone: `💰 <b>First $100!</b> Great start. Now build to $300 buffer before considering big purchases.`,
+      expansion_milestone: `📈 <b>Business Level ${state.bizLevel} reached!</b> New opportunities unlocked. Review them carefully.`,
+      legal_milestone: `⚖️ <b>LLC formed!</b> You're now protected. Consider storefront expansion next.`,
+      location_milestone: `🏪 <b>Second location opened!</b> Watch for reputation consistency across locations.`,
+      credit_milestone: `🏦 <b>Credit score ${state.creditScore}!</b> You now qualify for better loan terms.`,
+      loan_milestone: `📝 <b>First loan taken.</b> Make payments on time to build credit faster.`
+    };
+    
+    if (messages[adviceType]) {
+      showToast(`Alex: ${messages[adviceType]}`, 4000);
+    }
+  },
+  
+  getGeneralAdvice: function() {
+    return `
+      <div class="alex-response">
+        <div style="font-weight: 850; margin-bottom: 12px; color: #34d399;">General Business Strategy</div>
+        <div style="line-height: 1.6;">
+          <b>Core principles:</b><br/><br/>
+          1. <b>Protect reputation first</b> - it's hardest to rebuild<br/>
+          2. <b>Grow demand sustainably</b> - don't outpace capabilities<br/>
+          3. <b>Manage cash flow</b> - keep healthy buffer<br/>
+          4. <b>Invest in equipment</b> - best ROI for earnings<br/>
+          5. <b>Build credit early</b> - opens better options<br/><br/>
+          
+          <b>${this.userLevel === 4 ? 'Advanced tip:' : 'Current focus:'}</b><br/>
+          ${this.userLevel === 1 ? 'Master single shift consistency' :
+            this.userLevel === 2 ? 'Build to Business Level 3' :
+            this.userLevel === 3 ? 'Establish multi-location systems' :
+            'Optimize for maximum profitability'}
+        </div>
+      </div>
+    `;
+  }
+};
+
+// ==================== ACCOUNTANT SYSTEM ====================
+const AccountantSystem = {
+  hired: false,
+  level: 0,
+  weeklyCost: 0,
+  lastAdviceGiven: null,
+  
+  init: function() {
+    this.checkAutoHire();
+  },
+  
+  checkAutoHire: function() {
+    const monthlyExpenses = recurringExpensesAmount() * 10;
+    if (!this.hired && monthlyExpenses > 800 && state.cash > 1000) {
+      this.offerHire();
+    }
+  },
+  
+  offerHire: function() {
+    openModal(
+      "💼 Accountant Hiring Opportunity",
+      `
+        <div class="alex-response">
+          <div style="font-weight: 850; margin-bottom: 12px; color: #34d399;">Time to Hire Professional Help</div>
+          <div style="line-height: 1.6; margin-bottom: 20px;">
+            Your business is growing! Monthly expenses are ~${currency(recurringExpensesAmount() * 10)}.<br/><br/>
+            
+            <b>A junior accountant ($150/week) can:</b><br/>
+            • Save 10-15% on taxes and expenses<br/>
+            • Provide better loan terms<br/>
+            • Forecast cash flow issues<br/>
+            • Assess opportunity risks<br/>
+            • Reduce admin day surprises<br/><br/>
+            
+            <b>ROI:</b> Typically pays for itself within 2-3 weeks through savings alone.
+          </div>
+        </div>
+        
+        <div class="box">
+          <div style="font-weight: 950; margin-bottom: 6px;">Alex's Take</div>
+          <div class="note">
+            "This is a smart move at your stage. The savings alone will cover the cost, 
+            and the risk reduction is invaluable. I recommend hiring."
+          </div>
+        </div>
+      `,
+      [
+        {label: "Not Yet", onClick: closeModal},
+        {label: "Hire Junior Accountant ($150/week)", kind: "brand", onClick: () => {
+          this.hire(1);
+          closeModal();
+        }}
+      ]
+    );
+  },
+  
+  hire: function(level) {
+    this.hired = true;
+    this.level = level;
+    this.weeklyCost = level === 1 ? 150 : level === 2 ? 300 : 500;
+    
+    state.accountant = {
+      hired: true,
+      level: level,
+      weeklyCost: this.weeklyCost,
+      hiredDate: new Date().toISOString()
+    };
+    
+    addLedger("accountant", -this.weeklyCost, `Hired ${this.getTitle()} (weekly)`);
+    logEvent("accountant_hired", {level: level, cost: this.weeklyCost});
+    
+    saveState();
+    showToast(`Hired ${this.getTitle()}! Financial advice unlocked.`, 3000);
+    AudioSystem.play('success');
+  },
+  
+  getTitle: function() {
+    return ["Junior Accountant", "Senior Accountant", "CFO"][this.level - 1] || "Accountant";
+  },
+  
+  giveLoanAdvice: function(loanType) {
+    if (!this.hired) return null;
+    
+    const advice = {
+      title: `${this.getTitle()}'s Analysis`,
+      content: '',
+      recommendation: ''
+    };
+    
+    const monthlyIncome = Math.max(100, (state.cash / 3) * 4);
+    const newMonthlyPayment = loanType.weeklyPayment * 4;
+    const totalMonthlyPayments = state.loanEffects.monthlyPayments + newMonthlyPayment;
+    const debtToIncome = totalMonthlyPayments / monthlyIncome;
+    
+    const roiMonths = Math.ceil(loanType.amount / (monthlyIncome * 0.3));
+    
+    if (this.level === 1) {
+      advice.content = `
+        <div style="background: rgba(59,130,246,.1); border: 1px solid rgba(59,130,246,.3); border-radius: 12px; padding: 12px; margin: 10px 0;">
+          <div style="font-weight: 850; margin-bottom: 8px; color: #3b82f6;">Junior Accountant Analysis</div>
+          <div style="font-size: 13px; line-height: 1.5;">
+            • <b>Debt-to-income after loan:</b> ${(debtToIncome * 100).toFixed(1)}%<br/>
+            • <b>Weekly impact:</b> -${currency(loanType.weeklyPayment)} cash flow<br/>
+            • <b>Monthly cost:</b> ${currency(newMonthlyPayment)}<br/>
+            • <b>Estimated ROI:</b> ${roiMonths} months<br/><br/>
+            
+            ${debtToIncome > 0.4 ? '⚠️ <b>Warning:</b> Debt ratio would be high' : '✅ Debt ratio acceptable'}
+          </div>
+        </div>
+      `;
+      advice.recommendation = debtToIncome > 0.4 ? 'Not recommended' : 'Consider if ROI needed';
+    } else if (this.level >= 2) {
+      const savings = Math.floor(loanType.amount * (this.level === 3 ? 0.15 : 0.10));
+      const betterTerms = this.level === 3 ? 
+        `Could negotiate: ${currency(loanType.amount + 500)} at ${(loanType.apr * 100 - 2).toFixed(1)}% APR` :
+        'Standard terms acceptable';
+      
+      advice.content = `
+        <div style="background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.3); border-radius: 12px; padding: 12px; margin: 10px 0;">
+          <div style="font-weight: 850; margin-bottom: 8px; color: #22c55e;">${this.getTitle()} Analysis</div>
+          <div style="font-size: 13px; line-height: 1.5;">
+            • <b>Advanced assessment:</b><br/>
+            • Potential tax savings: ~${currency(savings)}<br/>
+            • ${betterTerms}<br/>
+            • Optimal payment timing identified<br/>
+            • Credit impact: +${this.level * 5} points if paid early<br/><br/>
+            
+            <b>Strategic recommendation:</b> ${debtToIncome > 0.35 ? 'Wait 2 weeks' : 'Proceed if growth planned'}
+          </div>
+        </div>
+      `;
+      advice.recommendation = debtToIncome > 0.35 ? 'Delay for better terms' : 'Good strategic move';
+    }
+    
+    return advice;
+  },
+  
+  giveOpportunityAdvice: function(opportunity) {
+    if (!this.hired) return null;
+    
+    const advice = {
+      title: `${this.getTitle()}'s Financial Assessment`,
+      content: ''
+    };
+    
+    const effectA = opportunity.a?.effect || {};
+    const cashFlowImpact = (effectA.cash || 0) + (this.level >= 2 ? 20 : 0);
+    
+    advice.content = `
+      <div style="background: rgba(139,92,246,.1); border: 1px solid rgba(139,92,246,.3); border-radius: 12px; padding: 12px; margin: 10px 0;">
+        <div style="font-weight: 850; margin-bottom: 8px; color: #8b5cf6;">Financial Impact Analysis</div>
+        <div style="font-size: 13px; line-height: 1.5;">
+          • <b>Immediate cash impact:</b> ${currency(cashFlowImpact)}<br/>
+          • <b>Tax implications:</b> ${cashFlowImpact > 0 ? 'Reportable income' : 'Potential deduction'}<br/>
+          ${this.level >= 2 ? `• <b>Opportunity cost:</b> ${currency(Math.abs(cashFlowImpact) * 0.7)} potential elsewhere<br/>` : ''}
+          ${this.level >= 3 ? `• <b>Strategic value:</b> ${cashFlowImpact > 100 ? 'High' : 'Moderate'}<br/>` : ''}
+          <br/>
+          <b>${this.getTitle()} suggests:</b> ${cashFlowImpact >= 0 ? 'Financially sound' : 'Consider cash reserve'}
+        </div>
+      </div>
+    `;
+    
+    return advice;
+  },
+  
+  processWeeklyPayment: function() {
+    if (!this.hired || !state.accountant) return;
+    
+    if (state.cash >= this.weeklyCost) {
+      state.cash -= this.weeklyCost;
+      addLedger("accountant", -this.weeklyCost, `${this.getTitle()} weekly salary`);
+      
+      const savings = Math.floor(this.weeklyCost * (this.level === 1 ? 1.2 : this.level === 2 ? 1.5 : 2));
+      const saved = Math.floor(Math.random() * savings);
+      
+      if (saved > 0) {
+        state.cash += saved;
+        addLedger("accountant_savings", saved, `${this.getTitle()} identified savings`);
+        showToast(`${this.getTitle()} saved you ${currency(saved)} this week!`, 3000);
+      }
+    } else {
+      showToast(`Can't pay ${this.getTitle()}. Consider letting them go or earning more.`, 3000);
+    }
+  }
+};
+
 function showConsentGateIfNeeded(){
   const overlay = document.getElementById("tcOverlay");
   const analyticsOpt = document.getElementById("analyticsOptIn");
@@ -853,8 +2142,9 @@ function showConsentGateIfNeeded(){
 
   const agreed = localStorage.getItem(CONSENT_KEY) === "yes";
   if(agreed){
-    // already accepted previously
     initAnalytics();
+    AlexMentor.init();
+    AccountantSystem.init();
     return;
   }
 
@@ -863,15 +2153,19 @@ function showConsentGateIfNeeded(){
   const enabled = localStorage.getItem(ANALYTICS_KEY);
   analyticsOpt.checked = (enabled === null) ? true : (enabled === "yes");
 
-  $("agreeBtn").onclick = ()=>{
+  document.getElementById("agreeBtn").onclick = ()=>{
     localStorage.setItem(CONSENT_KEY, "yes");
     localStorage.setItem(ANALYTICS_KEY, analyticsOpt.checked ? "yes" : "no");
     overlay.style.display = "none";
     initAnalytics();
     trackEvent("consent_accepted", { analytics_enabled: analyticsOpt.checked });
+    
+    setTimeout(() => {
+      AlexMentor.startInteractiveOnboarding();
+    }, 300);
   };
 
-  $("declineBtn").onclick = ()=>{
+  document.getElementById("declineBtn").onclick = ()=>{
     localStorage.setItem(CONSENT_KEY, "no");
     localStorage.setItem(ANALYTICS_KEY, "no");
     overlay.innerHTML = `
@@ -886,7 +2180,7 @@ function showConsentGateIfNeeded(){
     if(backBtn) backBtn.onclick = ()=> location.reload();
   };
 
-  $("resetConsentBtn").onclick = ()=>{
+  document.getElementById("resetConsentBtn").onclick = ()=>{
     localStorage.removeItem(CONSENT_KEY);
     localStorage.removeItem(ANALYTICS_KEY);
     alert("Consent reset. Reloading…");
@@ -894,7 +2188,7 @@ function showConsentGateIfNeeded(){
   };
 }
 
-// Track “quit mid shift” when user backgrounds/locks phone or closes the tab
+// Track "quit mid shift" when user backgrounds/locks phone or closes the tab
 document.addEventListener("visibilitychange", ()=>{
   if(document.hidden && state?.inShift && !__bl_quitTracked){
     __bl_quitTracked = true;
@@ -959,21 +2253,21 @@ const BIZ_LEVELS = [
     name: "Pop-up / Starter Spot",
     req: null,
     effect: { demandCap: 60, repFloor: 0, shiftBonus: 0 },
-    description: "You’re small and scrappy. Customers are curious but picky."
+    description: "You're small and scrappy. Customers are curious but picky."
   },
   {
     level: 2,
     name: "Neighborhood Favorite",
     req: { cash: 150, rep: 55, demand: 55 },
     effect: { demandCap: 75, repFloor: 5, shiftBonus: 8 },
-    description: "You’re known in the area. Word-of-mouth starts working for you."
+    description: "You're known in the area. Word-of-mouth starts working for you."
   },
   {
     level: 3,
     name: "Second Location Ready",
     req: { cash: 350, rep: 65, demand: 65 },
     effect: { demandCap: 90, repFloor: 10, shiftBonus: 15 },
-    description: "You’re scaling. More money, more problems (and bigger opportunities)."
+    description: "You're scaling. More money, more problems (and bigger opportunities)."
   }
 ];
 
@@ -987,7 +2281,7 @@ const UPGRADE_DEFS = [
     costGrowth: 1.35,
     maxLevel: 10,
     pros:["Fewer complaints", "Protects reputation"],
-    cons:["Costs cash", "Doesn’t directly increase demand"],
+    cons:["Costs cash", "Doesn't directly increase demand"],
     nextEffect: (lvl)=>({ rep:+(lvl>=2?2:1) }),
     passiveText: (lvl)=>`Customers trust you more. Packaging Level ${lvl}.`
   },
@@ -1011,7 +2305,7 @@ const UPGRADE_DEFS = [
     costGrowth: 1.40,
     maxLevel: 10,
     pros:["More customers show up", "Unlocks bigger opportunities"],
-    cons:["If quality can’t keep up, reputation may drop later"],
+    cons:["If quality can't keep up, reputation may drop later"],
     nextEffect: (lvl)=>({ demand:+2, rep:-1 }),
     passiveText: (lvl)=>`More eyes on you. Marketing Level ${lvl}.`
   },
@@ -1037,7 +2331,7 @@ const OPPORTUNITY_DEFS = [
     unlockBizLevel: 1,
     summary:"A local office wants catering for 50 people.",
     pros:["Instant cash", "More exposure"],
-    cons:["If you’re underprepared, you’ll take a reputation hit"],
+    cons:["If you're underprepared, you'll take a reputation hit"],
     a:{label:"Accept it", effect:{cash:+40, rep:-2, demand:+2}},
     b:{label:"Decline", effect:{cash:0, rep:+1, demand:0}}
   },
@@ -1067,9 +2361,43 @@ const OPPORTUNITY_DEFS = [
     unlockBizLevel: 3,
     summary:"A nearby venue wants a partnership deal.",
     pros:["Big demand boost", "Long term growth"],
-    cons:["If you can’t meet demand, reputation can crash"],
+    cons:["If you can't meet demand, reputation can crash"],
     a:{label:"Sign deal", effect:{cash:+60, rep:-3, demand:+5}},
     b:{label:"Wait", effect:{cash:0, rep:+2, demand:+0}}
+  }
+];
+
+// Loan types available
+const LOAN_TYPES = [
+  {
+    id: "starter",
+    name: "Starter Loan",
+    amount: 2000,
+    minCredit: 550,
+    apr: 0.18,
+    termWeeks: 12,
+    weeklyPayment: 185,
+    purpose: "Initial business setup and basic equipment"
+  },
+  {
+    id: "expansion",
+    name: "Expansion Loan", 
+    amount: 5000,
+    minCredit: 650,
+    apr: 0.14,
+    termWeeks: 24,
+    weeklyPayment: 240,
+    purpose: "Business level expansion or new location"
+  },
+  {
+    id: "equipment",
+    name: "Equipment Loan",
+    amount: 3000,
+    minCredit: 600,
+    apr: 0.16,
+    termWeeks: 16,
+    weeklyPayment: 210,
+    purpose: "Upgrade business equipment and tools"
   }
 ];
 
@@ -1093,12 +2421,22 @@ const defaultState = () => ({
   insurance: { active:false, tier:"none" },
   location: { city:"", state:"", country:"" },
 
-  // upgrades are levels, not booleans
   upgrades: {
     packaging: 0,
     staff: 0,
     marketing: 0,
     equipment: 0
+  },
+
+  creditScore: 650,
+  creditHistory: [],
+  activeLoans: [],
+  loanHistory: [],
+  
+  loanEffects: {
+    monthlyPayments: 0,
+    totalDebt: 0,
+    debtToIncomeRatio: 0
   },
 
   inShift: false,
@@ -1118,13 +2456,12 @@ const defaultState = () => ({
   startedAt: null,
   events: [],
 
-  // progression systems
   shiftsCompleted: 0,
-  operationStage: "home", // home -> foodtruck -> storefront
+  operationStage: "home",
   locations: 1,
   legal: { dba:false, llc:false, ein:false },
-  ledger: [], // {t,type,amount,desc}
-  lastChange: null // {title, deltas, notes}
+  ledger: [],
+  lastChange: null
 });
 
 let state = loadState();
@@ -1139,7 +2476,8 @@ let cellRefs = [];
 let badgeRefs = [];
 let emojiRefs = [];
 
-// (deduped: $ helper defined at top)
+// DOM helper
+const $ = (id)=>document.getElementById(id);
 
 const boardEl = $("board");
 const back = $("back");
@@ -1168,6 +2506,19 @@ function loadState(){
     st.profile ||= { ownerName:"", businessName:"Trap to Table" };
     st.upgrades ||= { packaging:0, staff:0, marketing:0, equipment:0 };
     st.seenTips ||= {};
+    
+    if(typeof st.creditScore !== "number") st.creditScore = 650;
+    if(!st.creditHistory) st.creditHistory = [];
+    if(!st.activeLoans) st.activeLoans = [];
+    if(!st.loanHistory) st.loanHistory = [];
+    if(!st.loanEffects) st.loanEffects = {
+      monthlyPayments: 0,
+      totalDebt: 0,
+      debtToIncomeRatio: 0
+    };
+    
+    updateLoanEffects(st);
+    
     if(typeof st.shiftPay !== "number") st.shiftPay = 0;
     if(!st.view) st.view = "hub";
     if(!st.activeHubTab) st.activeHubTab = "hub";
@@ -1179,7 +2530,30 @@ function loadState(){
     return defaultState();
   }
 }
-function saveState(){ localStorage.setItem(LS, JSON.stringify(state)); }
+
+function saveState(){ 
+  updateLoanEffects(state);
+  localStorage.setItem(LS, JSON.stringify(state)); 
+}
+
+function updateLoanEffects(st) {
+  let totalDebt = 0;
+  let monthlyPayments = 0;
+  
+  st.activeLoans.forEach(loan => {
+    totalDebt += loan.balance || 0;
+    monthlyPayments += loan.weeklyPayment * 4;
+  });
+  
+  const monthlyIncome = Math.max(1, (st.cash / 3) * 4);
+  const debtToIncomeRatio = totalDebt > 0 ? (monthlyPayments / monthlyIncome) : 0;
+  
+  st.loanEffects = {
+    totalDebt,
+    monthlyPayments,
+    debtToIncomeRatio: Math.min(1, debtToIncomeRatio)
+  };
+}
 
 function addLedger(type, amount, desc){
   const n = Math.round(amount||0);
@@ -1187,23 +2561,27 @@ function addLedger(type, amount, desc){
   if(state.ledger.length>60) state.ledger.length = 60;
   saveState();
 }
+
 function legalLabel(){
   const L = state.legal || {dba:false,llc:false,ein:false};
   if(L.llc) return "LLC";
   if(L.dba) return "DBA";
   return "Sole Prop";
 }
+
 function stageMeta(){
   const stage = state.operationStage || "home";
   if(stage==="home") return { key:"home", label:"Home-based", note:"Low overhead, limited capacity. Focus on consistency and trust." };
   if(stage==="foodtruck") return { key:"foodtruck", label:"Food Truck", note:"More reach, higher costs. Demand can grow faster but admin/permits matter." };
   return { key:"storefront", label:"Storefront", note:"Highest costs and expectations. Strong systems and legal setup become important." };
 }
+
 function stageReq(nextKey){
   if(nextKey==="foodtruck") return { cash:250, rep:58, demand:58, bizLevel:2 };
   if(nextKey==="storefront") return { cash:450, rep:65, demand:65, bizLevel:3, llc:true };
   return null;
 }
+
 function canAdvanceStage(){
   const stage = state.operationStage || "home";
   const next = stage==="home" ? "foodtruck" : (stage==="foodtruck" ? "storefront" : null);
@@ -1217,6 +2595,7 @@ function canAdvanceStage(){
   const ok = okCash && okRep && okDem && okBiz && okLLC;
   return { ok, next, req, okCash, okRep, okDem, okBiz, okLLC };
 }
+
 function canOpenNextLocation(){
   const okStage = (state.operationStage==="storefront");
   const okLLC = !!(state.legal && state.legal.llc);
@@ -1228,12 +2607,12 @@ function canOpenNextLocation(){
 }
 
 function currentWeekKey(){
-  // GAME TIME: 3 shifts = 1 day, 7 days = 1 week (21 shifts)
   const shifts = state.shiftsCompleted || 0;
-  const day = Math.floor(shifts / 3) + 1;         // Day 1 starts at 0-2 shifts
-  const week = Math.floor((day - 1) / 7) + 1;     // Week 1 starts at days 1-7
+  const day = Math.floor(shifts / 3) + 1;
+  const week = Math.floor((day - 1) / 7) + 1;
   return `G-W${String(week).padStart(2,"0")}`;
 }
+
 function gameClock(){
   const shifts = state.shiftsCompleted || 0;
   const day = Math.floor(shifts / 3) + 1;
@@ -1251,14 +2630,14 @@ function boosterCaps(){
     shuffle: 1 + Math.min(2, Math.floor(mkt/4))
   };
 }
+
 function ensureWeeklyReset(){
-  const wk = currentWeekKey(); // game week key
+  const wk = currentWeekKey();
   state.boosterMeta ||= { weekKey:"", purchasesThisWeek:{ promo:0, bomb:0, shuffle:0 } };
   if(state.boosterMeta.weekKey !== wk){
     const caps = boosterCaps();
     state.boosters ||= { promo:0, bomb:0, shuffle:0 };
-    const defaults = { promo:1, bomb:1, shuffle:1 }; // default weekly replenish
-    // refill up to max of defaults and caps (no infinite stacking)
+    const defaults = { promo:1, bomb:1, shuffle:1 };
     const target = {
       promo: Math.max(defaults.promo, caps.promo),
       bomb: Math.max(defaults.bomb, caps.bomb),
@@ -1272,6 +2651,7 @@ function ensureWeeklyReset(){
     saveState();
   }
 }
+
 function boosterPrice(key){
   const base = { promo:40, bomb:70, shuffle:55 }[key] || 50;
   const bought = state.boosterMeta?.purchasesThisWeek?.[key] || 0;
@@ -1280,8 +2660,6 @@ function boosterPrice(key){
 }
 
 function inShiftBoosterPrice(key){
-  // Players can buy anytime during a shift, but each in-shift buy ramps up fast.
-  // Price = weekly price * (2 + inShiftBuysForThisBooster)
   const n = (state.shiftBoosterPurchases?.[key] || 0);
   return Math.round(boosterPrice(key) * (2 + n));
 }
@@ -1336,7 +2714,7 @@ function openShiftBoosterShop(focusKey=null){
         <div class="badge">🚚</div>
         <div>
           <h3>Buy Shuffle <span class="muted">(Bought this shift: ${buys.shuffle||0})</span></h3>
-          <p>Shuffles the board when you’re stuck.</p>
+          <p>Shuffles the board when you're stuck.</p>
         </div>
       </div>
       <div class="right">
@@ -1348,12 +2726,11 @@ function openShiftBoosterShop(focusKey=null){
 
   openModal("In-Shift Shop", html, [{label:"Close", kind:"brand", onClick: closeModal}]);
 
-  // Optional: if a player clicked an empty booster, give a quick hint.
   if(focusKey){
     showToast(`Buy more <b>${focusKey}</b> boosters with Cash. Price increases each time you buy in this shift.`, 2600);
   }
 
-  const w = mBody; // modal body root
+  const w = mBody;
   const bp = w.querySelector("#shiftBuyPromo");
   if(bp) bp.onclick = ()=> shiftBuyBooster("promo");
   const bb = w.querySelector("#shiftBuyBomb");
@@ -1372,11 +2749,7 @@ function shiftBuyBooster(key){
 
   state.cash -= cost;
   state.boosters[key] = (state.boosters[key]||0) + 1;
-
-  // Count toward weekly purchases too
   state.boosterMeta.purchasesThisWeek[key] = (state.boosterMeta.purchasesThisWeek[key]||0) + 1;
-
-  // Increase in-shift inflation for this booster
   state.shiftBoosterPurchases[key] = (state.shiftBoosterPurchases[key]||0) + 1;
 
   addLedger("booster_shift_buy", -cost, `Bought booster during shift: ${key}`);
@@ -1386,6 +2759,7 @@ function shiftBuyBooster(key){
   closeModal();
   renderAll();
   showToast(`Bought <b>${key}</b> (in-shift).`, 2000);
+  AudioSystem.play('coin');
 }
 
 function maxBoosterPurchasesPerWeek(key){
@@ -1393,17 +2767,20 @@ function maxBoosterPurchasesPerWeek(key){
   const base = { promo:2, bomb:1, shuffle:1 }[key] || 1;
   return base + (lvl>=2 ? 1 : 0);
 }
+
 function buyBooster(key){
   ensureWeeklyReset();
   const limit = maxBoosterPurchasesPerWeek(key);
   const bought = state.boosterMeta.purchasesThisWeek[key] || 0;
   if(bought >= limit){
     showToast("Weekly purchase limit reached.", 2200);
+    AudioSystem.play('error');
     return;
   }
   const price = boosterPrice(key);
   if(state.cash < price){
     showToast(`Need $${price} to buy this booster.`, 2200);
+    AudioSystem.play('error');
     return;
   }
   state.cash -= price;
@@ -1414,11 +2791,11 @@ function buyBooster(key){
   saveState();
   renderAll();
   showToast(`Purchased ${key} booster (-$${price})`, 2200);
+  AudioSystem.play('coin');
 }
 
 function logEvent(type, data={}){
   state.events.push({ t:new Date().toISOString(), type, data });
-  // Send anonymous analytics event (if enabled)
   trackEvent(type, data);
   saveState();
 }
@@ -1429,6 +2806,7 @@ function showToast(html, ms=2400){
   clearTimeout(showToast._t);
   showToast._t = setTimeout(()=> toast.style.display="none", ms);
 }
+
 function openModal(title, bodyHTML, actions=[]){
   mTitle.textContent = title;
   mBody.innerHTML = bodyHTML;
@@ -1441,14 +2819,21 @@ function openModal(title, bodyHTML, actions=[]){
     mFoot.appendChild(b);
   });
   back.style.display = "flex";
+  AudioSystem.play('click');
 }
-function closeModal(){ back.style.display = "none"; }
-$$("mClose").onclick = closeModal;
+
+function closeModal(){ 
+  back.style.display="none"; 
+  AudioSystem.play('click');
+}
+
+$("mClose").onclick = closeModal;
 back.addEventListener("click", (e)=>{ if(e.target === back) closeModal(); });
 
 function esc(s){
   return String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
 }
+
 function tipOnce(key, msg){
   state.seenTips ||= {};
   if(state.seenTips[key]) return;
@@ -1457,12 +2842,28 @@ function tipOnce(key, msg){
   showToast(msg, 3000);
 }
 
-function setView(v){ state.view = v; saveState(); trackEvent("screen_viewed", {screen:v}); renderAll(); }
-function setHubTab(tab){ state.activeHubTab = tab; saveState(); trackEvent("hub_tab_viewed", {tab}); renderAll(); }
+function setView(v){ 
+  state.view = v; 
+  saveState(); 
+  trackEvent("screen_viewed", {screen:v}); 
+  renderAll();
+  AudioSystem.play('click');
+}
+
+function setHubTab(tab){ 
+  state.activeHubTab = tab; 
+  saveState(); 
+  trackEvent("hub_tab_viewed", {tab}); 
+  renderAll();
+  AudioSystem.play('click');
+}
+
 function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
 
 function clamp(x,a,b){ return Math.max(a, Math.min(b, x)); }
+
 function sleep(ms){ return new Promise(res=>setTimeout(res,ms)); }
+
 function shuffle(arr){
   for(let i=arr.length-1;i>0;i--){
     const j = Math.floor(Math.random()*(i+1));
@@ -1474,6 +2875,7 @@ function shuffle(arr){
 function currentBiz(){
   return BIZ_LEVELS.find(b=>b.level===state.bizLevel) || BIZ_LEVELS[0];
 }
+
 function nextBiz(){
   return BIZ_LEVELS.find(b=>b.level===state.bizLevel+1) || null;
 }
@@ -1486,6 +2888,7 @@ function canExpand(){
   const okDem = state.demand >= nb.req.demand;
   return { ok: okCash && okRep && okDem, okCash, okRep, okDem, req: nb.req };
 }
+
 function opNowText(){
   const b = currentBiz();
   const up = state.upgrades;
@@ -1500,6 +2903,7 @@ Stage: <b>${stg.label}</b> • Legal: <b>${lg}</b> • Locations: <b>${loc}</b><
 ${b.description}
   `.trim();
 }
+
 function opEffectText(){
   const b = currentBiz();
   const demandCap = b.effect.demandCap;
@@ -1512,7 +2916,7 @@ function opEffectText(){
   return `
 <b>Current operation effects:</b><br/>
 • Demand soft cap: <b>${demandCap}</b> (above this gets harder to grow)<br/>
-• Reputation protection: floor <b>${repFloor}</b> (you don’t drop below it from small mistakes)<br/>
+• Reputation protection: floor <b>${repFloor}</b> (you don't drop below it from small mistakes)<br/>
 • Shift completion bonus: <b>+$${shiftBonus}</b><br/>
 • Equipment earning boost: <b>+${Math.round(eqMult*100)}%</b> on tile earnings
   `.trim();
@@ -1520,7 +2924,7 @@ function opEffectText(){
 
 function nextBizReqText(){
   const nb = nextBiz();
-  if(!nb) return "You’re at the highest business level in this MVP.";
+  if(!nb) return "You're at the highest business level in this MVP.";
   const r = nb.req;
   return `
 Next Level ${nb.level}: <b>${nb.name}</b><br/>
@@ -1533,14 +2937,13 @@ Expansion unlocks new upgrades + opportunities.
 }
 
 function softCapDemandGrowth(delta){
-  // If demand above cap, growth is reduced
   const cap = currentBiz().effect.demandCap;
   if(delta<=0) return delta;
   if(state.demand >= cap) return Math.max(0, Math.floor(delta/2));
   return delta;
 }
+
 function applyEffect(eff){
-  // Apply with demand softcap + repFloor protection
   if(typeof eff.cash==="number") state.cash = Math.max(0, state.cash + eff.cash);
 
   if(typeof eff.rep==="number"){
@@ -1553,7 +2956,36 @@ function applyEffect(eff){
     const adjusted = softCapDemandGrowth(eff.demand);
     state.demand = clamp(state.demand + adjusted, 0, 100);
   }
+  
+  if(eff.cash > 50) {
+    updateCreditScore(2);
+  }
+  if(eff.cash < -100) {
+    updateCreditScore(-3);
+  }
+  if(eff.rep > 3) {
+    updateCreditScore(1);
+  }
+  
   saveState();
+}
+
+function updateCreditScore(change) {
+  const oldScore = state.creditScore;
+  state.creditScore = clamp(state.creditScore + change, 300, 850);
+  
+  if(oldScore !== state.creditScore) {
+    state.creditHistory.push({
+      date: new Date().toISOString(),
+      change,
+      newScore: state.creditScore,
+      reason: change > 0 ? "Positive financial behavior" : "Financial strain"
+    });
+    
+    if(state.creditHistory.length > 20) {
+      state.creditHistory = state.creditHistory.slice(-20);
+    }
+  }
 }
 
 function deltaPill(label, n){
@@ -1567,6 +2999,7 @@ function upgradeCost(def, nextLevel){
   const cost = Math.round(base * Math.pow(def.costGrowth, Math.max(0, nextLevel-1)));
   return cost;
 }
+
 function fmtEffect(eff){
   const parts = [];
   if(eff.cash) parts.push(deltaPill("Cash", eff.cash));
@@ -1663,21 +3096,34 @@ function showUpgradeDetails(key){
 function upgradeBuy(key){
   const def = UPGRADE_DEFS.find(d=>d.key===key);
   const lvl = state.upgrades[key]||0;
-  if(state.bizLevel < def.unlockBizLevel) return showToast(`Locked until Business Level ${def.unlockBizLevel}.`);
-  if(lvl >= def.maxLevel) return showToast("Already max level.");
+  if(state.bizLevel < def.unlockBizLevel) {
+    showToast(`Locked until Business Level ${def.unlockBizLevel}.`);
+    AudioSystem.play('error');
+    return;
+  }
+  if(lvl >= def.maxLevel) {
+    showToast("Already max level.");
+    AudioSystem.play('error');
+    return;
+  }
 
   const nextLevel = lvl+1;
   const cost = upgradeCost(def, nextLevel);
-  if(state.cash < cost) return showToast(`Not enough cash. Need $${cost}.`);
+  if(state.cash < cost) {
+    showToast(`Not enough cash. Need $${cost}.`);
+    AudioSystem.play('error');
+    return;
+  }
 
   state.cash -= cost;
   state.upgrades[key] = nextLevel;
 
   const eff = def.nextEffect(lvl);
-  // apply upgrade effect (shiftPayMult handled in earning calc; still store it via level)
   if(eff.rep) applyEffect({rep: eff.rep});
   if(eff.demand) applyEffect({demand: eff.demand});
   if(eff.cash) applyEffect({cash: eff.cash});
+
+  updateCreditScore(1);
 
   state.lastChange = {
     title: `${def.title} upgraded to Level ${nextLevel}`,
@@ -1689,6 +3135,7 @@ function upgradeBuy(key){
   saveState();
   renderAll();
   showToast(`${def.title} upgraded to Level ${nextLevel} ✔️`, 2400);
+  AudioSystem.play('success');
 }
 
 function renderOpps(){
@@ -1697,7 +3144,6 @@ function renderOpps(){
 
   const available = OPPORTUNITY_DEFS.filter(o=>state.bizLevel >= o.unlockBizLevel);
 
-  // simple rotation seed
   const seed = (state.rep*31 + state.demand*17 + state.cash*7 + state.bizLevel*101) % available.length;
   const picks = available.length ? [available[seed], available[(seed+1)%available.length]].filter(Boolean) : [];
 
@@ -1707,6 +3153,8 @@ function renderOpps(){
   }
 
   picks.forEach(opp=>{
+    const accountantAdvice = AccountantSystem.giveOpportunityAdvice(opp);
+    
     const el = document.createElement("div");
     el.className = "rowCard";
     el.innerHTML = `
@@ -1722,6 +3170,22 @@ function renderOpps(){
           <div class="box" style="margin-top:0">
             <div style="font-weight:950; margin-bottom:6px;">Cons</div>
             <div class="note">${opp.cons.map(p=>`• ${esc(p)}`).join("<br/>")}</div>
+          </div>
+        </div>
+        
+        ${accountantAdvice ? accountantAdvice.content : ''}
+        
+        <div class="box" style="margin-top:10px">
+          <div style="font-weight:950; margin-bottom:6px;">Alex's Take</div>
+          <div class="note">
+            ${opp.id === 'catering' ? 
+              "Good early opportunity if your packaging is decent. Don't take if rep < 55." :
+              opp.id === 'refunds' ?
+              "Refunding protects long-term value. The $12 is worth the reputation boost." :
+              opp.id === 'price' ?
+              "Raising prices tests demand elasticity. If demand stays strong, you can raise again later." :
+              "Big growth opportunity but high risk. Only take if you're confident in systems."
+            }
           </div>
         </div>
       </div>
@@ -1761,6 +3225,12 @@ function renderOpps(){
             <div style="font-weight:950; margin-bottom:6px;">Why it matters</div>
             <div class="note">This decision affects your ability to expand to the next business level.</div>
           </div>
+          ${AccountantSystem.hired ? 
+            `<div class="box">
+              <div style="font-weight:950; margin-bottom:6px;">${AccountantSystem.getTitle()} Note</div>
+              <div class="note">This ${eff.cash > 0 ? 'positive' : 'negative'} cash flow will ${eff.cash > 0 ? 'help' : 'hurt'} your short-term liquidity.</div>
+            </div>` : ''
+          }
         `,
         [
           {label:"Cancel", onClick: closeModal},
@@ -1769,6 +3239,7 @@ function renderOpps(){
             logEvent("decision", {opp:id, choice, eff});
             closeModal();
             showToast("Decision applied ✔️", 2200);
+            AudioSystem.play('success');
             renderAll();
           }}
         ]
@@ -1777,12 +3248,416 @@ function renderOpps(){
   });
 }
 
+// ==================== LOAN SYSTEM ====================
+function renderLoansTab() {
+  const list = $("loansList");
+  if (!list) return;
+  
+  list.innerHTML = "";
+  
+  const creditScore = state.creditScore || 650;
+  const creditTier = getCreditTier(creditScore);
+  
+  const creditCard = document.createElement("div");
+  creditCard.className = "rowCard";
+  creditCard.innerHTML = `
+    <div style="min-width:0">
+      <div class="title">Business Credit Score</div>
+      <div class="sub">Your creditworthiness affects loan terms and interest rates.</div>
+      <div style="display: flex; align-items: center; gap: 12px; margin-top: 10px;">
+        <div style="font-size: 32px; font-weight: 950; color: ${creditTier.color}">${creditScore}</div>
+        <div>
+          <div style="font-weight: 850;">${creditTier.name}</div>
+          <div class="note">${creditTier.description}</div>
+        </div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="pill ${creditTier.pillClass}">${creditTier.name}</div>
+      <div class="note" style="text-align: right; margin-top: 4px;">Updated weekly</div>
+    </div>
+  `;
+  list.appendChild(creditCard);
+  
+  if (state.activeLoans && state.activeLoans.length > 0) {
+    const activeHeader = document.createElement("div");
+    activeHeader.innerHTML = `<div style="font-weight: 950; margin: 20px 0 10px 0;">Active Loans</div>`;
+    list.appendChild(activeHeader);
+    
+    state.activeLoans.forEach((loan, index) => {
+      const progress = ((loan.termWeeks - loan.weeksRemaining) / loan.termWeeks) * 100;
+      const loanCard = document.createElement("div");
+      loanCard.className = "rowCard";
+      loanCard.innerHTML = `
+        <div style="min-width:0">
+          <div class="title">${loan.name}</div>
+          <div class="sub">Balance: ${currency(loan.balance)} • APR: ${(loan.apr * 100).toFixed(1)}%</div>
+          <div style="margin-top: 8px;">
+            <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
+              <span>Weekly payment: ${currency(loan.weeklyPayment)}</span>
+              <span>${loan.weeksRemaining} weeks remaining</span>
+            </div>
+            <div style="height: 6px; background: rgba(255,255,255,.1); border-radius: 3px; overflow: hidden;">
+              <div style="height: 100%; width: ${progress}%; background: ${progress > 70 ? '#34d399' : progress > 30 ? '#fbbf24' : '#fb7185'};"></div>
+            </div>
+          </div>
+        </div>
+        <div class="right">
+          <button class="btn small" data-payloan="${index}">Pay Early</button>
+          <div class="note" style="text-align: right; margin-top: 4px;">Total: ${currency(loan.amount)}</div>
+        </div>
+      `;
+      list.appendChild(loanCard);
+    });
+  }
+  
+  const availableHeader = document.createElement("div");
+  availableHeader.innerHTML = `<div style="font-weight: 950; margin: 20px 0 10px 0;">Available Loans</div>`;
+  list.appendChild(availableHeader);
+  
+  LOAN_TYPES.forEach(loanType => {
+    const canApply = state.creditScore >= loanType.minCredit;
+    const loanCard = document.createElement("div");
+    loanCard.className = "rowCard" + (canApply ? "" : " locked");
+    loanCard.innerHTML = `
+      <div style="min-width:0">
+        <div class="title">${loanType.name}</div>
+        <div class="sub">${loanType.purpose}</div>
+        <div class="note" style="margin-top: 8px;">
+          • Amount: ${currency(loanType.amount)}<br/>
+          • APR: ${(loanType.apr * 100).toFixed(1)}%<br/>
+          • Term: ${loanType.termWeeks} weeks<br/>
+          • Weekly payment: ${currency(loanType.weeklyPayment)}
+        </div>
+      </div>
+      <div class="right">
+        <div class="pill ${canApply ? 'brand' : 'gray'}">Min Credit: ${loanType.minCredit}</div>
+        ${canApply ? 
+          `<button class="btn primary" data-applyloan="${loanType.id}">Apply</button>` :
+          `<div class="note" style="text-align: center; margin-top: 8px;">Increase credit score to ${loanType.minCredit}</div>`
+        }
+      </div>
+    `;
+    list.appendChild(loanCard);
+  });
+  
+  if (state.loanHistory && state.loanHistory.length > 0) {
+    const historyHeader = document.createElement("div");
+    historyHeader.innerHTML = `<div style="font-weight: 950; margin: 20px 0 10px 0;">Loan History</div>`;
+    list.appendChild(historyHeader);
+    
+    state.loanHistory.slice(0, 3).forEach(loan => {
+      const historyCard = document.createElement("div");
+      historyCard.className = "rowCard";
+      historyCard.innerHTML = `
+        <div style="min-width:0">
+          <div class="title">${loan.name} • ${loan.status}</div>
+          <div class="sub">${new Date(loan.date).toLocaleDateString()}</div>
+          <div class="note">Amount: ${currency(loan.amount)} • Term: ${loan.termWeeks} weeks</div>
+        </div>
+        <div class="right">
+          <div class="pill ${loan.status === 'Paid' ? 'good' : 'bad'}">${loan.status}</div>
+        </div>
+      `;
+      list.appendChild(historyCard);
+    });
+  }
+  
+  setTimeout(() => {
+    list.querySelectorAll("button[data-applyloan]").forEach(btn => {
+      btn.onclick = () => applyForLoan(btn.dataset.applyloan);
+    });
+    list.querySelectorAll("button[data-payloan]").forEach(btn => {
+      btn.onclick = () => payLoanEarly(parseInt(btn.dataset.payloan));
+    });
+  }, 0);
+}
+
+function getCreditTier(score) {
+  if (score >= 750) return { 
+    name: "Excellent", 
+    color: "#34d399", 
+    pillClass: "good",
+    description: "Best loan terms available" 
+  };
+  if (score >= 700) return { 
+    name: "Good", 
+    color: "#60a5fa", 
+    pillClass: "brand",
+    description: "Favorable loan terms" 
+  };
+  if (score >= 650) return { 
+    name: "Fair", 
+    color: "#fbbf24", 
+    pillClass: "warn",
+    description: "Standard loan terms" 
+  };
+  if (score >= 600) return { 
+    name: "Poor", 
+    color: "#fb923c", 
+    pillClass: "bad",
+    description: "Higher interest rates" 
+  };
+  return { 
+    name: "Bad", 
+    color: "#fb7185", 
+    pillClass: "bad",
+    description: "Limited loan options" 
+  };
+}
+
+function applyForLoan(loanId) {
+  const loanType = LOAN_TYPES.find(l => l.id === loanId);
+  if (!loanType) return;
+  
+  if (state.creditScore < loanType.minCredit) {
+    showToast(`Credit score too low. Need ${loanType.minCredit}, you have ${state.creditScore}.`, 3000);
+    AudioSystem.play('error');
+    return;
+  }
+  
+  if (state.activeLoans.length >= 2) {
+    showToast("You can only have 2 active loans at a time.", 3000);
+    AudioSystem.play('error');
+    return;
+  }
+  
+  const accountantAdvice = AccountantSystem.giveLoanAdvice(loanType);
+  
+  const estimatedMonthlyIncome = Math.max(100, (state.cash / 3) * 4);
+  const newMonthlyPayment = loanType.weeklyPayment * 4;
+  const totalMonthlyPayments = state.loanEffects.monthlyPayments + newMonthlyPayment;
+  const newDebtToIncome = totalMonthlyPayments / estimatedMonthlyIncome;
+  
+  if (newDebtToIncome > 0.5) {
+    showToast("Loan denied: Your debt-to-income ratio would be too high.", 3000);
+    AudioSystem.play('error');
+    updateCreditScore(-5);
+    return;
+  }
+  
+  let modalContent = `
+    <p><b>Loan Details:</b></p>
+    <div class="box">
+      <div>Amount: <b>${currency(loanType.amount)}</b></div>
+      <div>APR: <b>${(loanType.apr * 100).toFixed(1)}%</b></div>
+      <div>Term: <b>${loanType.termWeeks} weeks</b></div>
+      <div>Weekly Payment: <b>${currency(loanType.weeklyPayment)}</b></div>
+      <div class="note" style="margin-top: 8px;">Total repayment: ${currency(loanType.weeklyPayment * loanType.termWeeks)}</div>
+      <div class="note">Debt-to-income after loan: ${(newDebtToIncome * 100).toFixed(1)}%</div>
+    </div>
+  `;
+  
+  modalContent += `
+    <div class="box">
+      <div style="font-weight: 950; margin-bottom: 6px;">Alex's Business Advice</div>
+      <div class="note">
+        ${newDebtToIncome > 0.4 ? 
+          "⚠️ <b>Caution:</b> This would strain your cash flow. Consider waiting or taking smaller amount." :
+          newDebtToIncome > 0.3 ?
+          "✅ <b>Manageable:</b> Debt level is acceptable if you have growth plans." :
+          "✅ <b>Good capacity:</b> You have room for this debt if needed for growth."
+        }<br/><br/>
+        
+        ${AccountantSystem.hired ? '' : 
+          "<i>Consider hiring an accountant for detailed financial analysis.</i>"
+        }
+      </div>
+    </div>
+  `;
+  
+  if (accountantAdvice) {
+    modalContent += accountantAdvice.content;
+  }
+  
+  modalContent += `
+    <div class="box">
+      <div style="font-weight: 950; margin-bottom: 6px;">Loan Purpose & Impact</div>
+      <div class="note">
+        ${loanType.purpose}<br/><br/>
+        <b>Consider:</b> Can you generate ${currency(loanType.weeklyPayment * 1.5)} extra per week to cover payments comfortably?
+      </div>
+    </div>
+  `;
+  
+  openModal(
+    `Apply for ${loanType.name}`,
+    modalContent,
+    [
+      {label: "Cancel", onClick: closeModal},
+      {label: "Accept Loan", kind: "brand", onClick: () => {
+        acceptLoan(loanType);
+        closeModal();
+      }}
+    ]
+  );
+}
+
+function acceptLoan(loanType) {
+  const newLoan = {
+    ...loanType,
+    balance: loanType.amount,
+    weeksRemaining: loanType.termWeeks,
+    startDate: new Date().toISOString(),
+    paymentsMade: 0,
+    totalPaid: 0
+  };
+  
+  state.activeLoans.push(newLoan);
+  state.cash += loanType.amount;
+  
+  state.loanHistory.unshift({
+    name: loanType.name,
+    amount: loanType.amount,
+    date: new Date().toISOString(),
+    status: "Active",
+    termWeeks: loanType.termWeeks
+  });
+  
+  if(state.loanHistory.length > 10) {
+    state.loanHistory = state.loanHistory.slice(0, 10);
+  }
+  
+  updateCreditScore(-3);
+  
+  addLedger("loan", loanType.amount, `Received ${loanType.name}`);
+  logEvent("loan_taken", {loanType: loanType.id, amount: loanType.amount});
+  
+  saveState();
+  renderAll();
+  showToast(`${loanType.name} approved! +${currency(loanType.amount)} added to cash.`, 3000);
+  AudioSystem.play('success');
+}
+
+function payLoanEarly(loanIndex) {
+  const loan = state.activeLoans[loanIndex];
+  if (!loan) return;
+  
+  const earlyPaymentAmount = Math.floor(loan.balance * 0.95);
+  
+  if (state.cash < earlyPaymentAmount) {
+    showToast(`Need ${currency(earlyPaymentAmount)} to pay loan early.`, 3000);
+    AudioSystem.play('error');
+    return;
+  }
+  
+  openModal(
+    "Pay Loan Early",
+    `
+      <p><b>Early Loan Payment</b></p>
+      <div class="box">
+        <div>Loan: <b>${loan.name}</b></div>
+        <div>Current Balance: <b>${currency(loan.balance)}</b></div>
+        <div>Early Payment (5% discount): <b>${currency(earlyPaymentAmount)}</b></div>
+        <div class="note" style="margin-top: 8px;">You save ${currency(loan.balance - earlyPaymentAmount)} by paying early!</div>
+      </div>
+      <div class="box">
+        <div style="font-weight: 950; margin-bottom: 6px;">Credit Impact</div>
+        <div class="note">
+          Paying off debt early significantly improves your credit score and shows financial responsibility.
+        </div>
+      </div>
+    `,
+    [
+      {label: "Cancel", onClick: closeModal},
+      {label: `Pay ${currency(earlyPaymentAmount)}`, kind: "brand", onClick: () => {
+        completeEarlyPayment(loanIndex, loan, earlyPaymentAmount);
+        closeModal();
+      }}
+    ]
+  );
+}
+
+function completeEarlyPayment(loanIndex, loan, amount) {
+  state.cash -= amount;
+  state.activeLoans.splice(loanIndex, 1);
+  
+  const historyEntry = state.loanHistory.find(h => 
+    h.name === loan.name && h.status === "Active"
+  );
+  if (historyEntry) {
+    historyEntry.status = "Paid Early";
+    historyEntry.paidDate = new Date().toISOString();
+  }
+  
+  updateCreditScore(15);
+  
+  addLedger("loan_payment", -amount, `Paid ${loan.name} early`);
+  logEvent("loan_paid_early", {loanType: loan.id, amount: amount});
+  
+  saveState();
+  renderAll();
+  showToast(`Loan paid off early! Credit score improved.`, 3000);
+  AudioSystem.play('success');
+}
+
+function processLoanPayments() {
+  if ((state.shiftsCompleted || 0) % 3 !== 0) return;
+  
+  let totalPayments = 0;
+  let missedPayments = 0;
+  
+  state.activeLoans = state.activeLoans.filter(loan => {
+    if (state.cash >= loan.weeklyPayment) {
+      state.cash -= loan.weeklyPayment;
+      loan.balance = Math.max(0, loan.balance - loan.weeklyPayment);
+      loan.weeksRemaining -= 1;
+      loan.paymentsMade += 1;
+      loan.totalPaid += loan.weeklyPayment;
+      totalPayments += loan.weeklyPayment;
+      
+      updateCreditScore(2);
+      
+      addLedger("loan_payment", -loan.weeklyPayment, `Weekly payment for ${loan.name}`);
+      
+      if (loan.weeksRemaining <= 0 || loan.balance <= 0) {
+        const historyEntry = state.loanHistory.find(h => 
+          h.name === loan.name && h.status === "Active"
+        );
+        if (historyEntry) {
+          historyEntry.status = "Paid";
+          historyEntry.paidDate = new Date().toISOString();
+        }
+        
+        updateCreditScore(20);
+        showToast(`${loan.name} paid off! Credit score improved.`, 3000);
+        AudioSystem.play('success');
+        return false;
+      }
+      return true;
+    } else {
+      missedPayments += 1;
+      loan.weeksRemaining += 1;
+      loan.balance = Math.floor(loan.balance * 1.05);
+      
+      updateCreditScore(-10);
+      
+      showToast(`Missed payment for ${loan.name}. Late fee added.`, 3000);
+      AudioSystem.play('error');
+      return true;
+    }
+  });
+  
+  if (totalPayments > 0) {
+    logEvent("loan_payments_processed", {totalPayments, missedPayments});
+  }
+  
+  saveState();
+}
+
+// ==================== END LOAN SYSTEM ====================
+
 function renderTabs(){
-  const tabs = ["hub","upgrades","opps"];
-  tabs.forEach(t=> $("tab"+cap(t)).classList.toggle("active", state.activeHubTab===t));
+  const tabs = ["hub","upgrades","opps","loans"];
+  tabs.forEach(t=> {
+    const tabEl = $("tab" + cap(t));
+    if(tabEl) tabEl.classList.toggle("active", state.activeHubTab===t);
+  });
+  
   $("hubTab").style.display = state.activeHubTab==="hub" ? "block" : "none";
   $("upgradesTab").style.display = state.activeHubTab==="upgrades" ? "block" : "none";
   $("oppsTab").style.display = state.activeHubTab==="opps" ? "block" : "none";
+  $("loansTab").style.display = state.activeHubTab==="loans" ? "block" : "none";
 }
 
 /** Shift levels */
@@ -1790,6 +3665,7 @@ function getNextShiftLevel(){
   const id = Math.min(state.nextShiftLevelId, LEVELS.length);
   return LEVELS.find(l=>l.id===id) || LEVELS[0];
 }
+
 function winLineForLevel(lvl){
   const parts = lvl.goals.map(g=>{
     if(g.type==="revenue") return `earn $${g.target}`;
@@ -1799,6 +3675,7 @@ function winLineForLevel(lvl){
   }).filter(Boolean);
   return parts.join(" and ");
 }
+
 function hubObjectiveText(){
   const lvl = getNextShiftLevel();
   const parts = lvl.goals.map(g=>{
@@ -1832,6 +3709,7 @@ function createBoardNoMatches(){
   }
   return b;
 }
+
 function createBoardForLevel(lvl){
   let b = createBoardNoMatches();
   const slots = [];
@@ -1900,6 +3778,7 @@ function tileEmoji(t){
   }
   return "❔";
 }
+
 function renderBoard(){
   for(let r=0;r<SIZE;r++){
     for(let c=0;c<SIZE;c++){
@@ -1955,6 +3834,7 @@ function renderGoalsBar(){
     bar.appendChild(div);
   });
 }
+
 function showGoalExplainer(key){
   if(key==="revenue"){
     openModal("Goal: Earn Money 💵",
@@ -1970,7 +3850,7 @@ function showGoalExplainer(key){
     openModal("Goal: Remove Bad Reviews 🗣️",
       `<p><b>What it means:</b> Bad Reviews take <b>2 hits</b>.</p>
        <div class="box"><div class="note">
-         You “hit” a review by clearing a tile next to it.<br/>
+         You "hit" a review by clearing a tile next to it.<br/>
          Clearing reviews increases your reputation.
        </div></div>`,
       [{label:"Close", onClick: closeModal}]
@@ -1997,12 +3877,11 @@ function startShift(){
   state.revenueEarned = 0;
   state.cratesDelivered = 0;
 
-  state.shiftBoosterPurchases = { promo:0, bomb:0, shuffle:0 }; // in-shift buy inflation
+  state.shiftBoosterPurchases = { promo:0, bomb:0, shuffle:0 };
   state.reviewsRemoved = 0;
-  // Shift completes here (1 day = 3 shifts)
   state.shiftsCompleted = (state.shiftsCompleted||0) + 1;
 
-  // End-of-day expenses are assessed after every day (every 3 shifts)
+  processLoanPayments();
   maybeRunAdminDay();
 
   state.shiftPay = 0;
@@ -2032,6 +3911,7 @@ function startShift(){
   renderAll();
   renderBoard();
   showToast("Shift started: earn money by clearing tiles 💵", 2400);
+  AudioSystem.play('success');
 }
 
 function adjacent(a,b){ return (Math.abs(a.r-b.r)+Math.abs(a.c-b.c))===1; }
@@ -2099,23 +3979,19 @@ function uniqueCells(matches){
   return out;
 }
 
-/** Earnings scale with upgrades + business level */
 function earningsMultiplier(){
   const biz = (state.bizLevel||1);
   const mkt = state.upgrades?.marketing || 0;
   const staff = state.upgrades?.staff || 0;
   const eq = state.upgrades?.equipment || 0;
-  // tuned for MVP: noticeable but not broken
   return (1 + (biz-1)*0.08) * (1 + mkt*0.01) * (1 + staff*0.005) * (1 + eq*0.03);
 }
 
-/** Equipment increases tile earnings */
 function equipmentMultiplier(){
   const lvl = state.upgrades.equipment || 0;
   return 1 + (lvl * 0.03);
 }
 
-/** Money earned during shift is immediate */
 function addRevenue(amount){
   const boosted = Math.round(amount * earningsMultiplier());
   state.shiftPay += boosted;
@@ -2124,6 +4000,8 @@ function addRevenue(amount){
   if(typeof state.goals.revenue === "number"){
     state.goals.revenue = Math.max(0, state.goals.revenue - boosted);
   }
+  
+  AudioSystem.play('coin');
 }
 
 function damageAdjacentReviews(clearedKeys){
@@ -2145,9 +4023,9 @@ function damageAdjacentReviews(clearedKeys){
           if(typeof state.goals.reviews === "number"){
             state.goals.reviews = Math.max(0, state.goals.reviews - 1);
           }
-          // packaging helps reputation outcomes over time (small bump on success events)
           state.rep = clamp(state.rep + 1, 0, 100);
           addRevenue(10);
+          AudioSystem.play('success');
         }
       }
     }
@@ -2177,6 +4055,7 @@ function checkCratesDelivered(){
       }
       addRevenue(25);
       showToast("Crate delivered 📦 (+Shift Pay)", 1600);
+      AudioSystem.play('success');
     }
   }
   dropAndRefill();
@@ -2204,7 +4083,6 @@ async function resolveLoop(){
     const toClear = uniqueCells(matches);
     const preserveKey = specialCreate ? (specialCreate.at.r+","+specialCreate.at.c) : null;
 
-    // Expand clears when specials are involved (ROW/COL/COLOR)
     const expandedClear = new Set();
     for(const p of toClear){
       const k = p.r+","+p.c;
@@ -2240,12 +4118,12 @@ async function resolveLoop(){
       const t = board[rr][cc];
       if(!t) continue;
 
-      // reviews are only removed by adjacency hits / bomb; specials shouldn't delete them directly
       if(t.kind==="review") continue;
 
       clearedKeys.add(k);
       board[rr][cc] = null;
       addRevenue(6);
+      AudioSystem.play('match');
     }
 
     if(specialCreate){
@@ -2277,6 +4155,7 @@ async function resolveLoop(){
     board = reshuffle(board);
     renderBoard();
     showToast("No moves… board reshuffled 🚚");
+    AudioSystem.play('click');
   }
 }
 
@@ -2312,6 +4191,7 @@ function onCellClick(e){
       else showToast("COLOR clearer: match it to clear a color.", 1800);
     }
     renderBoard();
+    AudioSystem.play('click');
     return;
   }
 
@@ -2353,8 +4233,6 @@ function onCellClick(e){
 
 /* Boosters */
 function setActiveBooster(key){
-  // If no boosters left, let the player buy more with the cash they actually have.
-  // In-shift prices increase each time you buy the same booster in the same shift.
   const have = state.boosters?.[key] || 0;
   if(have <= 0){
     openShiftBoosterShop(key);
@@ -2364,12 +4242,13 @@ function setActiveBooster(key){
   if(activeBooster===key) activeBooster = null;
   else activeBooster = key;
   renderAll();
+  AudioSystem.play('click');
 }
 
-$$("bPromo").onclick = ()=>{ tipOnce("promoTip", "📣 Promo: tap a tile to place a ROW/COL clearer."); setActiveBooster("promo"); };
-$$("bBomb").onclick = ()=>{ tipOnce("bombTip", "🧾 Bomb: tap a tile to clear 3x3 (Rep -1)."); setActiveBooster("bomb"); };
-$$("bShuffle").onclick = ()=>{ tipOnce("shuffleTip", "🚚 Shuffle: reshuffles the board if you’re stuck."); setActiveBooster("shuffle"); };
-$$("btnShiftShop").onclick = ()=>{ openShiftBoosterShop(); };
+$("bPromo").onclick = ()=>{ tipOnce("promoTip", "📣 Promo: tap a tile to place a ROW/COL clearer."); setActiveBooster("promo"); };
+$("bBomb").onclick = ()=>{ tipOnce("bombTip", "🧾 Bomb: tap a tile to clear 3x3 (Rep -1)."); setActiveBooster("bomb"); };
+$("bShuffle").onclick = ()=>{ tipOnce("shuffleTip", "🚚 Shuffle: reshuffles the board if you're stuck."); setActiveBooster("shuffle"); };
+$("btnShiftShop").onclick = ()=>{ openShiftBoosterShop(); };
 
 function renderBoosterUI(){
   $("cPromo").textContent = state.boosters.promo;
@@ -2426,13 +4305,13 @@ function placePromoSpecial(r,c,special){
   renderAll();
   renderBoard();
   showToast(special==="stripeH" ? "ROW clearer placed 📣" : "COL clearer placed 📣");
+  AudioSystem.play('success');
 }
 
 async function useRefundBomb(r,c){
   if(state.boosters.bomb<=0){ showToast("No Bomb boosters left."); return; }
   state.boosters.bomb--;
 
-  // repFloor protection
   applyEffect({rep:-1});
 
   const cleared = new Set();
@@ -2475,6 +4354,7 @@ async function useRefundBomb(r,c){
 
   if(checkWin()) return endShift(true);
   showToast("Bomb used 🧾");
+  AudioSystem.play('success');
 }
 
 function useShuffle(){
@@ -2487,6 +4367,7 @@ function useShuffle(){
   renderAll();
   renderBoard();
   showToast("Board shuffled 🚚");
+  AudioSystem.play('click');
 }
 
 function reshuffle(b){
@@ -2506,6 +4387,7 @@ function reshuffle(b){
   }
   return b;
 }
+
 function hasAnyMove(b){
   for(let r=0;r<SIZE;r++){
     for(let c=0;c<SIZE;c++){
@@ -2523,6 +4405,7 @@ function hasAnyMove(b){
   }
   return false;
 }
+
 function swapIn(b, a, c){
   const tmp = b[a.r][a.c];
   b[a.r][a.c] = b[c.r][c.c];
@@ -2541,12 +4424,8 @@ function endShift(win){
 
     state.cash += payout;
 
-    // staff helps demand slightly after wins
     if((state.upgrades.staff||0) > 0) applyEffect({demand:+1});
-
-    // packaging helps reputation on wins
     if((state.upgrades.packaging||0) > 0) applyEffect({rep:+1});
-
     applyEffect({rep:+1, demand:+1});
 
     state.unlockedShiftLevel = Math.min(LEVELS.length, Math.max(state.unlockedShiftLevel, lvl.id+1));
@@ -2569,11 +4448,11 @@ function endShift(win){
       `,
       [{label:"Back to Hub", kind:"brand", onClick: ()=>{ closeModal(); setView("hub"); setHubTab("upgrades"); }}]
     );
+    AudioSystem.play('success');
   }else{
     const kept = Math.floor(state.shiftPay * 0.5);
     state.cash += kept;
 
-    // small penalty but protected by repFloor
     applyEffect({rep:-1});
 
     logEvent("shift_lose", {level:lvl.id, shiftPay: state.shiftPay, kept});
@@ -2595,6 +4474,7 @@ function endShift(win){
         {label:"Back to Hub", kind:"brand", onClick: ()=>{ closeModal(); setView("hub"); }}
       ]
     );
+    AudioSystem.play('error');
   }
 
   state.shiftPay = 0;
@@ -2683,11 +4563,11 @@ function showProfileSetup(force=false){
         closeModal();
         renderAll();
         showToast("Saved ✔️", 1800);
+        AudioSystem.play('success');
       }}
     ]
   );
 
-  // wire legal + insurance controls in profile modal
   setTimeout(()=>{
     const insP = document.getElementById("insPill2");
     if(insP) insP.textContent = `Current: ${state.insurance?.tier||"none"} • Premium: $${state.insurance?.active ? insurancePremium() : 0}`;
@@ -2703,7 +4583,6 @@ function showProfileSetup(force=false){
   },0);
 
   if(force){
-    // disable cancel by hiding it
     const foot = document.getElementById("mFoot");
     if(foot && foot.children.length>=2){
       foot.children[0].style.display="none";
@@ -2711,11 +4590,8 @@ function showProfileSetup(force=false){
   }
 }
 
-
 function recurringExpensesAmount(){
-  // End-of-day overhead scales with where you are (home/foodtruck/storefront),
-  // how big you are (bizLevel, locations), and how much you've upgraded.
-  const stage = state.operationStage || "home"; // home -> foodtruck -> storefront
+  const stage = state.operationStage || "home";
   const stageBase = (stage==="home") ? 55 : (stage==="foodtruck" ? 95 : 160);
 
   const bizLevel = Math.max(1, state.bizLevel||1);
@@ -2723,27 +4599,23 @@ function recurringExpensesAmount(){
 
   const L = state.legal || {dba:false,llc:false,ein:false};
 
-  // Legal daily costs (rolled up from recurring obligations)
   const legalDaily =
     (L.dba ? 10 : 0) +
     (L.llc ? 25 : 0) +
     (L.ein ? 5 : 0);
 
   const up = state.upgrades || {packaging:0, staff:0, marketing:0, equipment:0};
-  const packagingUpkeep = (up.packaging||0) * 12;   // quality control + materials
-  const staffUpkeep = (up.staff||0) * 18;           // payroll pressure (simplified)
-  const marketingUpkeep = (up.marketing||0) * 20;   // ongoing spend to keep demand
-  const equipmentUpkeep = (up.equipment||0) * 25;   // maintenance + depreciation
+  const packagingUpkeep = (up.packaging||0) * 12;
+  const staffUpkeep = (up.staff||0) * 18;
+  const marketingUpkeep = (up.marketing||0) * 20;
+  const equipmentUpkeep = (up.equipment||0) * 25;
 
-  // Bigger business = bigger bills (rent/utilities, compliance, waste)
   const scale =
     (bizLevel-1) * 45 +
     (locations-1) * 65;
 
-  // Optional insurance adds premium (already demand-scaled in insurancePremium())
   const insurance = (state.insurance?.active ? insurancePremium() : 0);
 
-  // Demand increases variable costs slightly (more customers = more supplies/staff strain)
   const demand = Math.max(0, state.demand||0);
   const variable = Math.round(demand * 0.35);
 
@@ -2751,7 +4623,6 @@ function recurringExpensesAmount(){
     packagingUpkeep + staffUpkeep + marketingUpkeep + equipmentUpkeep +
     insurance + variable;
 
-  // Keep it meaningful; never trivial.
   return Math.max(45, Math.round(total));
 }
 
@@ -2762,6 +4633,7 @@ function insurancePremium(){
   const tierAdj = state.insurance?.tier==="plus" ? 1.35 : (state.insurance?.tier==="basic" ? 1.0 : 0);
   return Math.round(base * legalAdj * tierAdj);
 }
+
 function setInsurance(tier){
   state.insurance ||= { active:false, tier:"none" };
   state.insurance.tier = tier;
@@ -2771,6 +4643,7 @@ function setInsurance(tier){
   saveState();
   renderAll();
   showToast(`Insurance: ${tier}`, 2000);
+  AudioSystem.play('click');
 }
 
 function maybeRunAdminDay(){
@@ -2791,14 +4664,14 @@ function maybeRunAdminDay(){
     cards.push(`
       <div class="rowCard">
         <div style="min-width:0">
-          <div class="title">Register a DBA (“Doing Business As”)</div>
+          <div class="title">Register a DBA ("Doing Business As")</div>
           <div class="sub">Helps you operate under a business name. Looks official, but does <b>not</b> protect you like an LLC.</div>
           <div class="twoCol" style="margin-top:10px">
             <div class="box" style="margin-top:0"><div style="font-weight:950;margin-bottom:6px;">Pros</div>
               <div class="note">• Looks more official<br/>• Helps with bank/merchant setups<br/>• Low cost</div>
             </div>
             <div class="box" style="margin-top:0"><div style="font-weight:950;margin-bottom:6px;">Cons</div>
-              <div class="note">• No liability shield<br/>• You’re still personally on the hook</div>
+              <div class="note">• No liability shield<br/>• You're still personally on the hook</div>
             </div>
           </div>
         </div>
@@ -2865,7 +4738,7 @@ function maybeRunAdminDay(){
     openModal(
       "End of Day 🧾",
       `
-        <p><b>End of Day:</b> Every <b>3 shifts</b> (1 day), operating costs are deducted. This keeps money from feeling “free.”</p>
+        <p><b>End of Day:</b> Every <b>3 shifts</b> (1 day), operating costs are deducted. This keeps money from feeling "free."</p>
         <div class="box">
           <div><b>Expenses:</b> -$${expense}</div>
           <div class="note" style="margin-top:6px;">Costs scale with your Business Level and upgrades. Keep an eye on Cash.</div>
@@ -2888,6 +4761,7 @@ function maybeRunAdminDay(){
 function doLegalStep(kind, cost, eff){
   if(cost>0 && state.cash < cost){
     showToast(`Not enough cash. Need $${cost}.`, 2200);
+    AudioSystem.play('error');
     return;
   }
   const before = { cash: state.cash, rep: state.rep, demand: state.demand };
@@ -2906,6 +4780,7 @@ function doLegalStep(kind, cost, eff){
   closeModal();
   renderAll();
   showToast(`${kind.toUpperCase()} completed ✔️`, 2200);
+  AudioSystem.play('success');
 }
 
 function buildReport(){
@@ -2943,9 +4818,9 @@ function openFullReport(){
       <div style="font-weight:950;margin-bottom:6px;">Stage Upgrade Requirements</div>
       <div class="note">
         ${r.stageInfo.okCash?"✅":"❌"} Cash: $${state.cash} / $${r.stageInfo.req.cash}<br/>
-        ${r.stageInfo.okRep?"✅":"❌"} Reputation: ${state.rep} / ${r.stageInfo.req.rep}<br/>
-        ${r.stageInfo.okDem?"✅":"❌"} Demand: ${state.demand} / ${r.stageInfo.req.demand}<br/>
-        ${r.stageInfo.okBiz?"✅":"❌"} Business Level: ${state.bizLevel} / ${r.stageInfo.req.bizLevel}<br/>
+        ${r.stageInfo.okRep?"✅":"❌"} Reputation: ${state.rep} / $${r.stageInfo.req.rep}<br/>
+        ${r.stageInfo.okDem?"✅":"❌"} Demand: ${state.demand} / $${r.stageInfo.req.demand}<br/>
+        ${r.stageInfo.okBiz?"✅":"❌"} Business Level: ${state.bizLevel} / $${r.stageInfo.req.bizLevel}<br/>
         ${r.stageInfo.req.llc ? ((r.stageInfo.okLLC?"✅":"❌") + " LLC required") : "✅ LLC not required"}
       </div>
       <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
@@ -2982,7 +4857,7 @@ function openFullReport(){
 
       <div class="twoCol">
         <div class="box" style="margin-top:0">
-          <div style="font-weight:950;margin-bottom:6px;">What’s going well</div>
+          <div style="font-weight:950;margin-bottom:6px;">What's going well</div>
           <div class="note">${winHTML}</div>
         </div>
         <div class="box" style="margin-top:0">
@@ -3032,6 +4907,7 @@ function advanceStage(){
   closeModal();
   renderAll();
   showToast(`Stage upgraded to ${stageMeta().label} ✔️`, 2400);
+  AudioSystem.play('success');
 }
 
 function openNewLocation(){
@@ -3041,7 +4917,7 @@ function openNewLocation(){
   openModal(
     "New Location Setup",
     `
-      <p>You’re opening a new location. Choose where this location is based.</p>
+      <p>You're opening a new location. Choose where this location is based.</p>
       <div class="box">
         <div class="twoCol">
           <div>
@@ -3076,17 +4952,17 @@ function openNewLocation(){
         state.locations = (state.locations||1) + 1;
         applyEffect({demand:+3, rep:-1});
         addLedger("location", -chk.cost, `Opened a new location (${c||"City"}, ${s||"State"}, ${k||"Country"})`);
-        state.lastChange = { title:"New location opened", deltas:{ cash: state.cash - beforeCash, rep:-1, demand:+3 }, notes:"Demand rises, but growth strain can hurt reputation if systems aren’t strong." };
+        state.lastChange = { title:"New location opened", deltas:{ cash: state.cash - beforeCash, rep:-1, demand:+3 }, notes:"Demand rises, but growth strain can hurt reputation if systems aren't strong." };
         logEvent("location_open", {locations: state.locations, cost: chk.cost, city:c, state:s, country:k});
         saveState();
         closeModal();
         renderAll();
         showToast("Location opened 🏪", 2400);
+        AudioSystem.play('success');
       }}
     ]
   );
 }
-
 
 function openBoosterShop(){
   ensureWeeklyReset();
@@ -3110,6 +4986,7 @@ function openBoosterShop(){
     const c=document.getElementById("buy_bomb"); if(c) c.onclick=()=>buyBooster("bomb");
   },0);
 }
+
 function boosterShopRow(key,title,desc,cap){
   const count = state.boosters?.[key]||0;
   const price = boosterPrice(key);
@@ -3131,12 +5008,11 @@ function boosterShopRow(key,title,desc,cap){
   `;
 }
 
-
 function showHowToPlay(){
   openModal(
     "How to Play (Plain English)",
     `
-      <p><b>Block Legends starts in the Hub.</b> Hustle Match is a “shift” you work to earn money.</p>
+      <p><b>Block Legends starts in the Hub.</b> Hustle Match is a "shift" you work to earn money.</p>
 
       <div class="box">
         <div style="font-weight:950; margin-bottom:6px;">The loop</div>
@@ -3163,7 +5039,11 @@ function showHowToPlay(){
 function expandBusiness(){
   const chk = canExpand();
   const nb = nextBiz();
-  if(!nb) return showToast("You’re at the max business level in this MVP.");
+  if(!nb) {
+    showToast("You're at the max business level in this MVP.");
+    AudioSystem.play('error');
+    return;
+  }
 
   if(!chk.ok){
     openModal(
@@ -3173,13 +5053,13 @@ function expandBusiness(){
         <div class="box">
           <div class="note">
             ${chk.okCash ? "✅" : "❌"} Cash: $${state.cash} / $${nb.req.cash}<br/>
-            ${chk.okRep ? "✅" : "❌"} Reputation: ${state.rep} / ${nb.req.rep}<br/>
-            ${chk.okDem ? "✅" : "❌"} Demand: ${state.demand} / ${nb.req.demand}
+            ${chk.okRep ? "✅" : "❌"} Reputation: ${state.rep} / $${nb.req.rep}<br/>
+            ${chk.okDem ? "✅" : "❌"} Demand: ${state.demand} / $${nb.req.demand}
           </div>
         </div>
         <div class="box">
           <div style="font-weight:950; margin-bottom:6px;">How to get there</div>
-          <div class="note">Run more shifts to earn cash, buy upgrades, and pick opportunities that don’t destroy trust.</div>
+          <div class="note">Run more shifts to earn cash, buy upgrades, and pick opportunities that don't destroy trust.</div>
         </div>
       `,
       [{label:"Close", onClick: closeModal}]
@@ -3190,7 +5070,7 @@ function expandBusiness(){
   openModal(
     "Expand Business",
     `
-      <p><b>You’re ready.</b> Expand to Business Level ${nb.level}: <b>${esc(nb.name)}</b></p>
+      <p><b>You're ready.</b> Expand to Business Level ${nb.level}: <b>${esc(nb.name)}</b></p>
       <div class="box">
         <div style="font-weight:950; margin-bottom:6px;">What will happen</div>
         <div class="note">
@@ -3215,6 +5095,7 @@ function expandBusiness(){
         closeModal();
         renderAll();
         showToast(`Expanded to Business Level ${nb.level} ✔️`, 2400);
+        AudioSystem.play('success');
       }}
     ]
   );
@@ -3223,11 +5104,21 @@ function expandBusiness(){
 /** Render everything */
 function renderAll(){
   ensureWeeklyReset();
+  processLoanPayments();
+  
+  AlexMentor.calculateUserLevel();
+  AlexMentor.updateFloatingButton();
+  AlexMentor.trackMilestones();
+  AccountantSystem.checkAutoHire();
+  
+  if ((state.shiftsCompleted || 0) % 3 === 0 && AccountantSystem.hired) {
+    AccountantSystem.processWeeklyPayment();
+  }
+  
   // views
   $("viewHub").classList.toggle("active", state.view==="hub");
   $("viewMatch").classList.toggle("active", state.view==="match");
 
-  // title/left hints
   if(state.view==="hub"){
     $("leftTitle").textContent = "Block Legends Hub (Trap to Table)";
     $("leftHint").textContent = "Run your business. Work shifts to earn money. Upgrade and expand.";
@@ -3236,7 +5127,6 @@ function renderAll(){
     $("leftHint").textContent = "Finish all goals before moves hit 0. Tap goals to learn what they mean.";
   }
 
-  // profile display
   const owner = state.profile.ownerName ? `Owner: ${state.profile.ownerName}` : "Owner: —";
   const biz = state.profile.businessName || "Trap to Table";
   $("bizLine").textContent = `Your Business: ${biz}`;
@@ -3245,166 +5135,160 @@ function renderAll(){
   $("brandH").textContent = "Block Legends";
   $("brandS").textContent = `${biz} • Work shifts • Upgrade to expand`;
 
-  // objective
   $("nextObjective").textContent = hubObjectiveText();
-  $("plainObjective").textContent = "Work Hustle Match shifts to earn cash. Spend cash on repeatable upgrades. Meet requirements to expand your business level.";
 
-  // hub operation panels
+  $("cash").textContent = currency(state.cash);
+  $("rep").textContent = Math.round(state.rep);
+  $("demand").textContent = Math.round(state.demand);
+  $("bizLevel").textContent = state.bizLevel;
+
+  const stage = stageMeta();
+  $("locPill").textContent = `Locations: ${state.locations||1}`;
+  $("legalPill").textContent = `Legal: ${legalLabel()}`;
+  $("stagePill").textContent = `Stage: ${stage.label}`;
+  $("stageNote").textContent = stage.note;
+
+  $("plainObjective").textContent = hubObjectiveText();
+
+  const nextLvl = getNextShiftLevel();
+  $("shiftStatusPill").textContent = `Next Shift: Level ${nextLvl.id}`;
+
   $("opNow").innerHTML = opNowText();
   $("opEffectNow").innerHTML = opEffectText();
   $("nextBizReq").innerHTML = nextBizReqText();
 
-  // expand status
-  const chk = canExpand();
-  if(!nextBiz()){
-    $("expandStatus").textContent = "Max level";
+  const expChk = canExpand();
+  $("btnExpand").disabled = !expChk.ok;
+  if(!expChk.ok){
+    $("expandStatus").textContent = "Not ready";
     $("expandStatus").className = "pill gray";
   }else{
-    $("expandStatus").textContent = chk.ok ? "Ready" : "Not ready";
-    $("expandStatus").className = chk.ok ? "pill good" : "pill gray";
+    $("expandStatus").textContent = "Ready!";
+    $("expandStatus").className = "pill good";
   }
 
-  // tabs
   renderTabs();
 
-  // snapshot
-  if(state.inShift){
-    $("cash").textContent = `$${state.cash} (+$${state.shiftPay})`;
-  }else{
-    $("cash").textContent = `$${state.cash}`;
-  }
-  $("rep").textContent = String(state.rep);
-  $("demand").textContent = String(state.demand);
-  $("bizLevel").textContent = String(state.bizLevel);
+  $("cashForUpgrades").textContent = currency(state.cash);
+  renderUpgradeList();
+  
+  renderOpps();
+  
+  renderLoansTab();
 
-  // stage / legal / locations
-  const stage = stageMeta();
-  if($("locPill")) $("locPill").textContent = `Locations: ${state.locations||1}`;
-  if($("legalPill")) $("legalPill").textContent = `Legal: ${legalLabel()}`;
-  if($("stagePill")) $("stagePill").textContent = `Stage: ${stage.label}`;
-  if($("stageNote")) $("stageNote").textContent = stage.note;
-
-  const toNextAdmin = (3 - ((state.shiftsCompleted||0) % 3)) % 3;
-  if($("adminCyclePill")) $("adminCyclePill").textContent = (()=>{
-    const clk = gameClock();
-    const adminTxt = (toNextAdmin===0 ? "End of Day: now" : `End of Day: in ${toNextAdmin} shift(s)`);
-    return `Day ${clk.day} • Shift ${clk.shiftOfDay}/3 • ${adminTxt}`;
-  })();
-
-  // report summary
-  const repObj = buildReport();
-  const summary = repObj.concerns.length ? `⚠️ ${repObj.concerns[0]}` : `✅ ${repObj.wins[0] || "Steady growth. Keep running shifts."}`;
-  if($("reportSummary")) $("reportSummary").textContent = summary;
-
-  $("shiftStatusPill").textContent = `Next Shift: Level ${getNextShiftLevel().id}`;
-  $("cashForUpgrades").textContent = `Cash: $${state.cash}`;
-
-  if(state.activeHubTab==="upgrades") renderUpgradeList();
-  if(state.activeHubTab==="opps") renderOpps();
+  const r = buildReport();
+  $("reportSummary").textContent = r.concerns.length ? 
+    `${r.concerns[0]}` : 
+    "Business is stable. Focus on growth.";
+  $("adminCyclePill").textContent = r.adminMsg;
 
   if(state.view==="match"){
-    const lvl = getNextShiftLevel();
-    $("matchTitle").textContent = `Hustle Match • Level ${lvl.id} — ${lvl.name}`;
-    $("matchWinLine").textContent = `Win this shift: ${winLineForLevel(lvl)} before you run out of moves.`;
-    $("movesLeft").textContent = String(state.movesLeft);
-    $("shiftPay").textContent = `$${state.shiftPay}`;
-
-    // progress fill based on revenue target if present
-    const target = (typeof state.goals.revenue==="number")
-      ? (lvl.goals.find(g=>g.type==="revenue")?.target || 0)
-      : 0;
-    let pct = 0;
-    if(target>0){
-      const earned = Math.max(0, target - (state.goals.revenue||0));
-      pct = clamp(Math.round((earned/target)*100), 0, 100);
-    }else{
-      pct = clamp(Math.round((state.shiftPay/200)*100),0,100);
-    }
-    $("payFill").style.width = pct + "%";
-
-    renderBoosterUI();
+    $("movesLeft").textContent = state.movesLeft;
+    $("shiftPay").textContent = currency(state.shiftPay);
+    
+    const revGoal = state.goals.revenue || 100;
+    const fillPct = Math.min(100, Math.round((state.revenueEarned||0) / revGoal * 100));
+    $("payFill").style.width = fillPct + "%";
+    
     renderGoalsBar();
+    renderBoosterUI();
+    if(board) renderBoard();
+  }
+
+  if(!state.profileSeen){
+    setTimeout(()=> showProfileSetup(true), 600);
   }
 }
 
-/** Buttons */
-$$("btnHome").onclick = ()=> setView("hub");
-$$("btnHow").onclick = ()=> showHowToPlay();
-$$("brandH").onclick = ()=> showHowToPlay();
-$$("btnProfile").onclick = ()=>{ trackEvent("profile_opened", {}); showProfileSetup(false); };
-$$("btnReport").onclick = ()=>{ trackEvent("report_opened", {}); openFullReport(); };
-$$("btnOpenReport").onclick = ()=>{ trackEvent("report_opened", {source:"hub_quick"}); openFullReport(); };
+// Event Listeners
+$("btnHome").onclick = ()=> { setView("hub"); setHubTab("hub"); };
+$("btnHow").onclick = showHowToPlay;
+$("btnProfile").onclick = ()=> showProfileSetup();
+$("btnReport").onclick = openFullReport;
+$("btnOpenReport").onclick = openFullReport;
 
-$$("btnStartShift").onclick = ()=>{
-  if(state.nextShiftLevelId > state.unlockedShiftLevel) return showToast("That shift is locked. Win the current shift to unlock.");
-  trackEvent("shift_start_clicked", {level: getNextShiftLevel()?.id || null});
-  startShift();
-};
-$$("btnViewUpgrades").onclick = ()=> setHubTab("upgrades");
-$$("btnViewOpps").onclick = ()=> setHubTab("opps");
-$$("btnExpand").onclick = ()=> expandBusiness();
+$("btnStartShift").onclick = startShift;
+$("btnViewUpgrades").onclick = ()=> setHubTab("upgrades");
+$("btnViewOpps").onclick = ()=> setHubTab("opps");
+$("btnViewLoans").onclick = ()=> setHubTab("loans");
+$("btnExpand").onclick = expandBusiness;
+$("btnBackToHubTop").onclick = ()=> setView("hub");
 
-$$("tabHub").onclick = ()=> setHubTab("hub");
-$$("btnViewUpgrades").onclick = ()=> setHubTab("upgrades");
-$$("btnViewOpps").onclick = ()=> setHubTab("opps");
+["tabHub","tabUpgrades","tabOpps","tabLoans"].forEach(id=>{
+  const el = $(id);
+  if(el) el.onclick = ()=> setHubTab(el.dataset.tab);
+});
 
-$$("btnBackToHubTop").onclick = ()=>{ trackEvent("back_to_hub_clicked", {from:"match"}); setView("hub"); };
-
-$$("btnReset").onclick = ()=>{
-  localStorage.removeItem(LS);
-  state = defaultState();
-  state.sessionId = "sess_" + Math.random().toString(16).slice(2) + "_" + Date.now().toString(16);
-  state.startedAt = new Date().toISOString();
-  saveState();
-
-  board = null; selected = null; lockInput = false; activeBooster = null;
-  cellRefs = []; badgeRefs = []; emojiRefs = [];
-
-  trackEvent("game_reset", {});
-  showToast("Reset complete.");
-  renderAll();
-  showProfileSetup(true);
-};
-
-$$("btnExport").onclick = ()=>{
-  trackEvent("export_opened", {});
-  const payload = {
-    sessionId: state.sessionId,
-    startedAt: state.startedAt,
-    snapshot: {
-      profile: state.profile,
-      view: state.view,
-      cash: state.cash, rep: state.rep, demand: state.demand, bizLevel: state.bizLevel,
-      nextShiftLevelId: state.nextShiftLevelId, unlockedShiftLevel: state.unlockedShiftLevel,
-      boosters: state.boosters, upgrades: state.upgrades
-    },
-    events: state.events
-  };
-  const json = JSON.stringify(payload, null, 2);
+// Reset button
+$("btnReset").onclick = ()=>{
   openModal(
-    "Export (copy/paste JSON)",
-    `<p>Stored locally (no server). Copy this JSON if you want to review test sessions.</p>
-     <div class="box"><pre class="mono" style="white-space:pre-wrap;word-break:break-word;margin:0;">${json.replaceAll("<","&lt;")}</pre></div>`,
+    "Reset Game Data",
+    `
+      <p><b>This will delete all progress and start fresh.</b></p>
+      <div class="box">
+        <div class="note">Your current Cash, Reputation, Upgrades, and Progress will be erased.</div>
+      </div>
+    `,
+    [
+      {label:"Cancel", onClick: closeModal},
+      {label:"Reset Everything", kind:"danger", onClick: ()=>{
+        localStorage.removeItem(LS);
+        state = defaultState();
+        saveState();
+        closeModal();
+        location.reload();
+      }}
+    ]
+  );
+};
+
+// Help button in match
+$("btnHelp").onclick = ()=>{
+  openModal(
+    "Shift Tips",
+    `
+      <p><b>Hustle Match is your "work shift."</b> You earn money immediately by clearing tiles.</p>
+      <div class="box">
+        <div style="font-weight:950; margin-bottom:6px;">Goals</div>
+        <div class="note">
+          • 💵 Earn money: clear tiles for Shift Pay<br/>
+          • 🗣️ Bad Reviews: hit them twice<br/>
+          • 📦 Deliver crates: get them to bottom row
+        </div>
+      </div>
+      <div class="box">
+        <div style="font-weight:950; margin-bottom:6px;">Specials</div>
+        <div class="note">
+          • 4-match → ROW or COL clearer<br/>
+          • 5-match → COLOR clearer<br/>
+          • Match specials for bigger clears
+        </div>
+      </div>
+    `,
     [{label:"Close", onClick: closeModal}]
   );
 };
 
-/** Boot */
-function boot(){
-  // Terms + analytics gate (first launch)
-  showConsentGateIfNeeded();
-  renderAll();
-  if(!state.profileSeen){
-    showProfileSetup(true);
-  }else if(!state.tutorialSeen){
-    state.tutorialSeen = true;
-    saveState();
-    showToast(`Welcome back, ${state.profile.ownerName || "Owner"} 👋`, 2200);
-  }else{
-    showToast(`Session: <b>${state.sessionId}</b>`, 2200);
-  }
-}
-boot();
+// Alex Help Button
+$("btnAlexHelp").onclick = function() {
+  AlexMentor.showAdviceMenu();
+};
+
+// Initialize
+showConsentGateIfNeeded();
+AlexMentor.init();
+AccountantSystem.init();
+renderAll();
+buildBoardDOMOnce();
+
+// Export for debugging
+window.__BL = {
+  state,
+  saveState,
+  reset: ()=> { localStorage.removeItem(LS); location.reload(); },
+  cheat: (cash=1000)=> { state.cash += cash; saveState(); renderAll(); },
+  setBizLevel: (lvl)=> { state.bizLevel = lvl; saveState(); renderAll(); }
+};
 </script>
 </body>
 </html>
